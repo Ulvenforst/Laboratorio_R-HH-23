@@ -1,0 +1,121 @@
+ID	edad	genero	zona	grado	HHD	HHI	comp_HHD	comp_HHI	per.hog
+1	18	femenino	URBANO	10	152	1848	Uso.baño	Carne	3
+2	11	femenino	1	6	117	1387	Uso_baño	Carne	2
+3	11	1	Urbano	sexto	276	567	USO.BAÑO	Carne	7
+4	12	Femenino	Rural	SEXTO	273	1356	Uso.baño	Carne	5
+5	11	Femenino	Urbano	6	92	1344	Uso.baño	Carne	1
+6	14	2	Urbano	7		1344	Uso.baño	Carne	7
+7	12	masculino	Urbano	septimo	102	961	Riego.jardin	Carne	4
+8	15	masculino	1	septimo	93	1350	Uso.baño	CARNE	2
+9	13	masculino	Urbano	7	56		Uso.baño	Carne	6
+10	14	MASCULINO	2	7	98	573	Uso.baño	CARNE	5
+11	13	1	Rural	septimo	35	35	Uso.baño	Carne	6
+12	12	1	Rural	7	169	586	Uso.baño	Carne	4
+13	13	MASCULINO	Rural	OCTAVO	197	197	Uso.baño	Carne	6
+14	13	MASCULINO	RURAL	8	96	1503	Uso.baño	Carne	
+15	13	MASCULINO	RURAL	8	87	420	Uso.baño	Carne	7
+16	13	Femenino	Rural	OCTAVO	154	536	Uso.baño	Carne	2
+17	13	Femenino	Urbano	OCTAVO	241	629	Uso_baño	Carne	4
+18	13	Femenino	Urbano	OCTAVO	241	629	Uso.baño	Carne	4
+19	13	1	Urbano	8	76		Uso.baño	Carne	3
+20	13	Femenino	Rural	8	133	1011	USO.BAÑO	Carne	3
+21	12	MASCULINO	Rural	SEPTIMO	48	432	Uso.baño	Carne	3
+22	12	Masculino	Urbano	septimo	60	60	Uso.baño	CARNE	4
+23	16	2	Rural	7	63	955	Uso.baño	Carne	4
+24	14	femenino	1	7		210	Uso.baño	Fruta	4
+25	12	FEMENINO	Urbano	7	129	426	Uso.baño	Carne	4
+26	15	FEMENINO	Rural	11	279	1378	Uso.baño	Carne	2
+27	14	Masculino	2	septimo	320	320	Uso.baño	Fruta	2
+28	15	FEMENINO	1	DECIMO	76	968	Uso.baño	Carne	3
+29	16	Femenino	Urbano	10	149	827	Uso.baño	Carne	7
+30	15	Masculino	URBANO	10	1	2	USO.BAÑO	Fruta	
+31	16	Masculino	Urbano	DECIMO	92	0	USO.BAÑO	Fruta	1
+32	16	masculino	Rural	once	19	413	Uso.baño	Carne	3
+33	18	Femenino	Rural	once	274	388	Uso.baño	Carne	4
+34	17	masculino	Urbano	DECIMO	94	3	Uso.baño	Carne	6
+35	14	1	Urbano	9	25	1522	Uso.baño	Carne	3
+36	14	Femenino	Rural	noveno	105	1782	Uso.baño	Carne	3
+37	14	Femenino	Urbano	noveno	209	2631	Uso_baño	CARNE	4
+38	17	Masculino	Urbano	once	154	368	Uso.baño	Carne	2
+39	17	Masculino	Urbano	10	154	164	Uso.baño	Carne	2
+40	14	Femenino	Urbano	octavo	83	131	Uso.baño	Fruta	8
+41	13	MASCULINO	URBANO	8	41	1306	Uso.baño	Carne	2
+42	20	2	Urbano	10		37	Uso.baño	Fruta	2
+43	19	Femenino	Urbano	noveno	109	968	Uso.cocina	Carne	5
+44	13	2	Urbano	octavo	88	617	Uso.baño	Carne	4
+45	14	2	1	8	211	768	Uso.baño	Carne	5
+46	15	2	Rural	7	188	1177	Uso.baño	Carne	5
+47	12	Masculino	Urbano	septimo	120	444	Uso.baño	CARNE	9
+48	14	Masculino	Rural	7	49	204	Uso.baño	Carne	
+49	15	FEMENINO	Rural	septimo	64		Uso.baño	Carne	5
+50	13	Masculino	Urbano	septimo	91	961	Uso.baño	Carne	4
+51	12	Femenino	Urbano	SEPTIMO	23	438	Uso.baño	Carne	4
+52	12	MASCULINO	Rural	SEPTIMO	31	6	Uso.baño	Fruta	4
+53	14	femenino	Urbano	7	61	1553	Uso_baño	Carne	3
+54	12	Femenino	Rural	7		1553	USO.BAÑO	Carne	6
+55	16	Femenino	Rural	11	130	955	Uso.baño	Carne	3
+56	18	Masculino	Urbano	ONCE	93	567	Uso.baño	Carne	4
+57	16	masculino	Rural	ONCE	100	395	Uso.baño	Carne	4
+58	18	Femenino	2	once	129	401	Uso.baño	Carne	4
+59	17	Femenino	2	once	102	2004	Uso.baño	CARNE	4
+60	11	Femenino	Urbano	sexto	127	1368	Uso.baño	Carne	3
+61	12	Femenino	Urbano	6	147	1331	Uso.baño	Carne	2
+62	12	femenino	2	SEXTO	117	1368	Uso.baño	Carne	5
+63	13	1	Urbano	6	263	44	Uso.baño	Café	5
+64	11	Masculino	2	6	45		USO.BAÑO	Carne	5
+65	13	Masculino	Rural	6	137	777	Uso.baño	Carne	3
+66	14	FEMENINO	Rural	SEXTO	401	401	Uso.baño	Fruta	7
+67	11	Masculino	Rural	6		802	Uso_baño	Carne	6
+68	12	femenino	Rural	6	306	648	Uso.baño	Carne	
+69	12	2	Urbano	SEXTO	186	382	Uso.baño	Carne	5
+70	11	Femenino	Rural	6	125	1350	Uso.baño	Carne	3
+71	11	Masculino	URBANO	6	83	420	Uso.baño	CARNE	5
+72	12	Masculino	Urbano	sexto	97	1344	Uso.baño	Carne	3
+73	12	Femenino	Urbano	sexto	217	1350	Uso.baño	Carne	8
+74	15	MASCULINO	Rural	9	92	1325	Uso.baño	Carne	1
+75	15	masculino	Rural	9	201	1356	Uso.baño	Carne	6
+76	16	masculino	RURAL	NOVENO	109	789	Uso.baño	Carne	1
+77	14	masculino	Urbano	9	111	444	Uso.baño	Carne	3
+78	14	Femenino	Urbano	NOVENO	115	980	Uso.baño	Carne	5
+79	14	Femenino	Urbano	9	115		Lavado.ropa	Café	2
+80	15	Masculino	Urbano	9	28	611	Uso.baño	Carne	4
+81	14	Femenino	Urbano	NOVENO		451	Uso.baño	Carne	5
+82	14	Femenino	Urbano	9	242	1547	Uso.baño	CARNE	6
+83	14	FEMENINO	RURAL	9	71	573	Uso.baño	Carne	7
+84	15	Femenino	Rural	9	388	115	Uso_baño	Carne	6
+85	15	Masculino	RURAL	NOVENO	19	1177	Uso.cocina	Carne	3
+86	15	Femenino	Rural	NOVENO	171	1319	Uso.baño	Carne	
+87	13	Femenino	Rural	9	133	1356	Uso.baño	Carne	3
+88	15	Masculino	Rural	decimo	112	1356	Uso.baño	Carne	6
+89	16	Masculino	Urbano	10	95	876	Uso.baño	Carne	4
+90	16	1	URBANO	10	95	131	Uso.baño	Café	1
+91	15	2	Urbano	decimo	277	586	Uso.baño	Carne	5
+92	15	Femenino	Rural	decimo	225	1344	Uso.baño	Carne	7
+93	16	FEMENINO	Urbano	10	154	1879	Uso.baño	Carne	3
+94	16	2	Urbano	10	262		Uso.baño	CARNE	2
+95	16	2	2	decimo	41	629	Uso.baño	Carne	3
+96	16	masculino	Rural	10	178	980	Uso.baño	Carne	5
+97	20	Femenino	1	decimo	51	949	Uso.baño	Carne	5
+98	17	masculino	Urbano	10		51	Uso.baño	Carne	4
+99	15	MASCULINO	Urbano	DECIMO	72	388	Uso.baño	Carne	2
+100	16	Femenino	Urbano	10	141	758	Uso.baño	Carne	4
+101	16	Femenino	URBANO	DECIMO	104	382	Uso.baño	CAFÉ	4
+102	15	FEMENINO	URBANO	decimo	138	130	Uso.baño	Carne	3
+103	13	Masculino	URBANO	octavo	45	457	Uso.baño	Carne	2
+104	13	Masculino	2	8	79	592	Uso.baño	Carne	3
+105	13	Masculino	2	8	81	1225	Uso.baño	CAFÉ	1
+106	13	Masculino	Urbano	OCTAVO	152	357	Uso.baño	Carne	2
+107	13	Femenino	2	OCTAVO	103	1356	Uso.baño	Carne	
+108	17	1	Urbano	OCTAVO	217	12	Uso.baño	Fruta	8
+109	14	1	URBANO	8	217	12	Uso.baño	Fruta	8
+110	14	1	RURAL	8	325	25	Uso.baño	Fruta	102
+111	14	Femenino	Urbano	8	134		Uso.baño	Carne	2
+112	14	Femenino	Urbano	octavo		1152	Uso.baño	Carne	5
+113	17	2	Rural	11	69	1171	Uso.baño	Carne	4
+114	16	2	Urbano	11	72	1368	Uso.baño	Carne	7
+115	15	femenino	Urbano	once	109	1165	Uso.baño	Carne	3
+116	17	Masculino	Urbano	11	62	1177	Uso.baño	Carne	3
+117	19	Masculino	Urbano	ONCE	71	1165	Uso.baño	Carne	5
+118	14	femenino	1	octavo	90	1165	Uso.baño	Carne	5
+119	13	femenino	Urbano	8	60	986	Uso.baño	Carne	3
+120	14	masculino	Urbano	8	57	789	Uso.baño	Carne	4
