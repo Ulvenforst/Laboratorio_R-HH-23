@@ -78,12 +78,12 @@ Como entregable del presente laboratorio, usted debe ubicar en el campus virtual
 enlaces web que dirijan a los archivos comprimidos, cuando el archivo supere el tamaño máximo de carga el 
 campus virtual) que contenga los siguientes elementos:
 
-1. Solución_R.zip: contiene los soportes de la solución del laboratorio en R
-    a. El archivo *consistencia.txt*
-    b. El archivo *ReporteCambios.txt*
-    c. La nueva hoja de datos *clean_huella.csv*
-    d. El script R, *Script_R.txt*, editado adecuadamente con una división desplegable asociada a cada uno de los puntos desarrollados (Puntos 1 a 6) 
-2. *Informe_Huella.pdf*: Contiene el informe escrito, donde evidencia el desarrollo de los puntos del laboratorio. En este deben estar los tableros gráficos y sus respectivas interpretaciones
+1. *Solución_R.zip*: contiene los soportes de la solución del laboratorio en R
+    - El archivo *consistencia.txt*
+    - El archivo *ReporteCambios.txt*
+    - La nueva hoja de datos *clean_huella.csv*
+    - El script R, *Script_R.txt*, editado adecuadamente con una división desplegable asociada a cada uno de los puntos desarrollados (Puntos 1 a 6) 
+3. *Informe_Huella.pdf*: Contiene el informe escrito, donde evidencia el desarrollo de los puntos del laboratorio. En este deben estar los tableros gráficos y sus respectivas interpretaciones
 
 ## Condiciones de entrega.
 1. Trabajo en equipo - El laboratorio debe ser desarrollado en grupos de 3 personas. (No se recibirán
