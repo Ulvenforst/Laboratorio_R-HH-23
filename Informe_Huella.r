@@ -70,4 +70,3 @@ datos <- datos %>%
 
 # Verificar los cambios
 View(datos)
-
