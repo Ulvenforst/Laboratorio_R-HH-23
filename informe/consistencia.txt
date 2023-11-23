@@ -1,0 +1,59 @@
+# Laboratorio, Preprocesamiento de datos con R, Probabilidad y Estadística.
+# Archivo: consistencia.txt
+# Autores: Juan Camilo Narváez Tascón, 2140112-3743
+#          Óscar David Cuaical, 2270657-3743
+# Fecha creación: 23-11-23
+# Fecha última modificación: 23-11-23
+# Licencia: GPL-3.0
+
+Reglas de Consistencia para BD_huella.txt:
+
+1. Rango de Edad: La edad de los estudiantes debe ser razonable para el nivel de educación secundaria:
+   ∴ {∀edad ∈ ℤ | 10 ≤ edad ≤ 20}
+
+2. Consistencia de Género: El género debe ser femenino (1) o masculino (2), tras la transformación realizada:
+  
+   {∀genero ∈ {'1', '2'} 
+   | genero_i := '1' ⇔ (genero_i == 'femenino' ∨ '1') 
+   ⊕ genero_i := '2' ⇔ (genero_i == 'masculino' ∨ '2')}
+  
+  Se consideran cambios sutiles, como tildes o mayúsculas para 'femenino' o 'masculino'. Además se etiqueta '1' como 'femenino' y '2' como 'masculino' para una mejor lectura.
+
+3. Consistencia de Zona: La zona debe ser urbana (1) o rural (2), de acuerdo con la recodificación:
+
+   ∴ {∀zona ∈ {'1', '2'} 
+   | zona_i := '1' ⇔ (zona_i == 'urbano' ∨ '1') 
+   ⊕ zona_i := '2' ⇔ (zona_i == 'rural' ∨ '2')}
+  
+  Se consideran cambios sutiles, como tildes o mayúsculas para 'rural' o 'urbano'. Además se etiqueta '1' como 'urbano' y '2' como 'rural' para una mejor lectura.
+
+4. Consistencia de Grado Escolar: El grado escolar debe estar entre sexto (6) y once (11), según la recodificación.
+
+   ∴ {∀grado ∈ {'6', '7', '8', '9', '10', '11'} 
+   | grado_i := '6' ⇔ (grado_i == 'sexto' ∨ '6') 
+   ⊕ grado_i := '7' ⇔ (grado_i == 'septimo' ∨ '7')
+   ⊕ grado_i := '8' ⇔ (grado_i == 'octavo' ∨ '8')
+   ⊕ grado_i := '9' ⇔ (grado_i == 'noveno' ∨ '9')
+   ⊕ grado_i := '10' ⇔ (grado_i == 'decimo' ∨ '10')
+   ⊕ grado_i := '11' ⇔ (grado_i == 'once' ∨ '11')}
+
+   Se consideran cambios sutiles, como tildes o mayúsculas para el grado textual. Además se relacionan las etiquetas numéricas con su respectivo grado textual para una mejor lectura.
+
+5. Consistencia en comp_HHD y comp_HHI; no deben haber variaciones textuales de un mismo componente, por ende se usan minúsculas. Al tratarse de variables nominales no se hace uso de codificación y se respeta el formato establecido:
+   {∀comp_HHD,comp_HHI ∈ {'uso_baño','lavado_ropa','uso_cocina',...,'〈actividad〉〈separador〉〈lugar〉'} | 〈separador〉 := '_'}
+
+6. Validez de Huella Hídrica Directa e Indirecta (HHD y HHI): Estos valores deben ser positivos y lógicos.
+   Dominio = {HHD, HHI ∈ ℝ⁺ | HHD > 0 ∧ HHI > 0}
+  Además, si HHI, HHD == '' (o NA) se remplaza por una regresión lineal, esto es:
+   HHD_i ∉ Dominio ⇒ HHD_i := f_RL(HHD_i)
+   HHI_i ∉ Dominio ⇒ HHI_i := f_RL(HHI_i)
+  f_RL(x) representa la función de regresión lineal aplicada para estimar los valores faltantes de HHD o HHI, esto es:
+   f_RL(x) = a + (b_1 × x_1) + (b_2 × x_2) + ... + (b_n × x_n) + ε
+  Donde 'a' es el término de intercepción, que representa el valor esperado de f_RL cuando todas las x_i son cero. b_i son los coeficientes de regresión asociados con cada variable independiente, que representan el cambio esperado en f_RL por una unidad de cambio en x_i, manteniendo las demás 'x' constantes.
+  ε es el término de error, que representa la variación en f_RL no explicada por las variables independientes. Se asume que ε tiene una distribución normal con media cero y varianza constante (homocedasticidad).
+
+7. Consistencia en Número de Personas en el Hogar (per.hog): Debe ser un número positivo y lógico. 
+   Dominio = {per.hog ∈ ℤ | per.hog > 0}
+  Por ende, en caso de per.hog == '' (o NA) se remplaza por la media, esto es:
+   per.hog_i ∉ Dominio ⇒ per.hog_i := x̄(per.hog)
+  Donde x̄(per.hog) = (Σper.hog_i)/N
