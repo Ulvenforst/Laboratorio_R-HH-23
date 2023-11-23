@@ -81,7 +81,7 @@ datos$HHI[is.na(datos$HHI)] <- predict(modelo, newdata = datos[is.na(datos$HHI),
 ## Limpieza de datos -> Cambiar Strings
 
 #Columna comp_HDD
-reglas_comp_HHD <- c("uso.baño" = "baño",
+vals_comp_HHD <- c("uso.baño" = "baño",
                      "riego.jardin" = "jardin",
                      "uso.cocina" = "cocina",
                      "lavado.ropa" = "ropa")
@@ -90,20 +90,20 @@ datos <- datos %>%
   mutate(comp_HHD = tolower(comp_HHD)) %>%
   mutate(comp_HHD = gsub("_", ".", comp_HHD)) %>%
   mutate(comp_HHD = case_when(
-    comp_HHD %in% names(reglas_comp_HHD) ~ reglas_comp_HHD[comp_HHD],
+    comp_HHD %in% names(vals_comp_HHD) ~ vals_comp_HHD[comp_HHD],
     TRUE ~ as.character(comp_HHD)
   ))
 
 
 #Columna comp_HHI
-reglas_comp_HHI <- c("carne" = "carne",
+vals_comp_HHI <- c("carne" = "carne",
                      "fruta" = "fruta",
                      "café" = "café")
 
 datos <- datos %>%
   mutate(comp_HHI = tolower(comp_HHI)) %>%
   mutate(comp_HHI = case_when(
-    comp_HHI %in% names(reglas_comp_HHI) ~ reglas_comp_HHI[comp_HHI],
+    comp_HHI %in% names(vals_comp_HHI) ~ vals_comp_HHI[comp_HHI],
     TRUE ~ as.character(comp_HHI)
   ))
 
