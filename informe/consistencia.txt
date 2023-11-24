@@ -14,8 +14,8 @@ Reglas de Consistencia para BD_huella.txt:
 2. Consistencia de Género: El género debe ser femenino (1) o masculino (2), tras la transformación realizada:
   
    {∀genero ∈ {'1', '2'} 
-   | genero_i := '1' ⇔ (genero_i == 'femenino' ∨ '1') 
-   ⊕ genero_i := '2' ⇔ (genero_i == 'masculino' ∨ '2')}
+   | genero_i := '1' ≡ (genero_i == 'femenino' ∨ '1') 
+   ⊕ genero_i := '2' ≡ (genero_i == 'masculino' ∨ '2')}
   
   Se consideran cambios sutiles, como tildes o mayúsculas para 'femenino' o 'masculino'. Además se etiqueta '1'
   como 'femenino' y '2' como 'masculino' para una mejor lectura.
@@ -32,12 +32,12 @@ Reglas de Consistencia para BD_huella.txt:
 4. Consistencia de Grado Escolar: El grado escolar debe estar entre sexto (6) y once (11), según la recodificación.
 
    ∴ {∀grado ∈ {'6', '7', '8', '9', '10', '11'} 
-   | grado_i := '6' ⇔ (grado_i == 'sexto' ∨ '6') 
-   ⊕ grado_i := '7' ⇔ (grado_i == 'septimo' ∨ '7')
-   ⊕ grado_i := '8' ⇔ (grado_i == 'octavo' ∨ '8')
-   ⊕ grado_i := '9' ⇔ (grado_i == 'noveno' ∨ '9')
-   ⊕ grado_i := '10' ⇔ (grado_i == 'decimo' ∨ '10')
-   ⊕ grado_i := '11' ⇔ (grado_i == 'once' ∨ '11')}
+   | grado_i := '6' ≡ (grado_i == 'sexto' ∨ '6') 
+   ⊕ grado_i := '7' ≡ (grado_i == 'septimo' ∨ '7')
+   ⊕ grado_i := '8' ≡ (grado_i == 'octavo' ∨ '8')
+   ⊕ grado_i := '9' ≡ (grado_i == 'noveno' ∨ '9')
+   ⊕ grado_i := '10' ≡ (grado_i == 'decimo' ∨ '10')
+   ⊕ grado_i := '11' ≡ (grado_i == 'once' ∨ '11')}
 
    Se consideran cambios sutiles, como tildes o mayúsculas para el grado textual. Además se relacionan las etiquetas
    numéricas con su respectivo grado textual para una mejor lectura.
