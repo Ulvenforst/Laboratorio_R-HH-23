@@ -45,7 +45,8 @@ Reglas de Consistencia para BD_huella.txt:
 5. Consistencia en comp_HHD y comp_HHI; no deben haber variaciones textuales de un mismo componente, por ende se usan
 minúsculas. Al tratarse de variables nominales no se hace uso de codificación y se respeta el formato establecido:
 
-   {∀comp_HHD,comp_HHI ∈ {'uso_baño','lavado_ropa','uso_cocina',...,'〈actividad〉〈separador〉〈lugar〉'} | 〈separador〉 := '_'}
+   {∀comp_HHD ∈ {'uso_baño','lavado_ropa','uso_cocina',...,'〈actividad〉〈separador〉〈lugar〉'} | 〈separador〉 := '_'}
+   {∀comp_HHI ∈ {'carne','fruta','cafe',...,〈componente〉}}
 
 6. Validez de Huella Hídrica Directa e Indirecta (HHD y HHI): Estos valores deben ser positivos y lógicos.
    Dominio = {HHD, HHI ∈ ℝ⁺ | HHD > 0 ∧ HHI > 0}
