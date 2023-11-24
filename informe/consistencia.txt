@@ -23,8 +23,8 @@ Reglas de Consistencia para BD_huella.txt:
 3. Consistencia de Zona: La zona debe ser urbana (1) o rural (2), de acuerdo con la recodificación:
 
    ∴ {∀zona ∈ {'1', '2'} 
-   | zona_i := '1' ⇔ (zona_i == 'urbano' ∨ '1') 
-   ⊕ zona_i := '2' ⇔ (zona_i == 'rural' ∨ '2')}
+   | zona_i := '1' ≡ (zona_i == 'urbano' ∨ '1')
+   ⊕ zona_i := '2' ≡ (zona_i == 'rural' ∨ '2')}
   
   Se consideran cambios sutiles, como tildes o mayúsculas para 'rural' o 'urbano'. Además se etiqueta '1' como
   'urbano' y '2' como 'rural' para una mejor lectura.
