@@ -21,10 +21,11 @@ zona %in% c("1", "2")
 # Consistencia de Grado Escolar
 grado %in% c("6", "7", "8", "9", "10", "11")
 
-# Consistencia en comp_HHD y comp_HHI
-# Asegurar que los componentes están en la lista predefinida (reemplazar con los valores reales)
-comp_HHD %in% c("uso_baño", "lavado_ropa", "uso_cocina", ...)
-comp_HHI %in% c("carne", "fruta", "cafe", ...)
+# Consistencia en comp_HHD
+comp_HHD %in% c("uso_ba_o", "riego_jardin", "uso_cocina", "lavado_ropa")
+
+# Consistencia en comp_HHI
+comp_HHI %in% c("Carne", "Fruta", "Café")
 
 # Validez de Huella Hídrica Directa e Indirecta (HHD y HHI)
 HHD > 0
