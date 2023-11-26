@@ -25,12 +25,11 @@ grado %in% c("6", "7", "8", "9", "10", "11")
 comp_HHD %in% c("uso_ba_o", "riego_jardin", "uso_cocina", "lavado_ropa")
 
 # Consistencia en comp_HHI
-comp_HHI %in% c("Carne", "Fruta", "Café")
+comp_HHI %in% c("carne", "fruta", "café")
 
 # Validez de Huella Hídrica Directa e Indirecta (HHD y HHI)
 HHD > 0
 HHI > 0
-# Nota: La imputación de valores faltantes mediante regresión no se puede expresar en editrules
 
 # Consistencia en Número de Personas en el Hogar (per.hog)
 per.hog > 0
