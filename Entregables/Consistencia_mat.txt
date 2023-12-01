@@ -1,0 +1,37 @@
+OSCAR DAVID CUAICAL LOPEZ
+JUAN CAMILO NARVAES TASCON
+
+---REPORTE DE CAMBIOS---
+
+
+
+# 1.1 LIMPIEZA DE DATOS -> CAMBIAR NOMBRES DE ELEMENTOS DEL DATAFRAME 
+
+datos["genero"] = {1 si datos["genero"] = "femenino" } ∧ {2 si datos["genero"] = "masculino" }
+
+datos["zona"] = {1 si datos["zona"] = "urbano" } ∧ {2 si datos["zona"] = "rural" }
+
+datos["grado"] = {6 si datos["grado"] = "sexto" } ∧ {7 si datos["grado"] = "septimo" } ∧ {8 si datos["grado"] = "octavo" } ∧
+		 {9 si datos["grado"] = "noveno" } ∧ {10 si datos["grado"] = "decimo" } ∧ {11 si datos["grado"] = "once" }
+
+
+# 1.1.2 LIMPIEZA DE DATOS -> CAMBIAR REGISTROS NA POR EL VALOR PROMEDIO DE LA COLUMNA
+
+X̅ = 1/N[Σ x(i)]
+
+X̅(y) DEVUELVE: Media aritmetica del parametro "y"
+
+X̅(comp_HHD) = Float
+
+datos["comp_HHD"] = is.na[datos(comp_HHD)]
+
+# 1.1.3 LIMPIEZA DE DATOS -> CAMBIAR NOMBRES PARA COMPONETES DE HUELLA HIDRICA
+
+tolower = y(x) => Minusculas(x)
+
+datos["comp_HHD"] = tolower(comp_HHD)
+datos["comp_HHD"] = {baño si datos["comp_HHD"] = "uso.baño" } ∧ {jardin si datos["comp_HHD"] = "riego.jardin" } ∧
+		    {ropa si datos["comp_HHD"] = "lavado.ropa" } ∧ {cocina si datos["comp_HHD"] = "uso.cocina" }
+
+datos["comp_HHI"] = tolower(comp_HHI)
+
