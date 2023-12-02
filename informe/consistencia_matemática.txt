@@ -3,7 +3,6 @@
 # Autores: Juan Camilo Narváez Tascón, 2140112-3743
 #          Óscar David Cuaical, 2270657-3743
 # Fecha creación: 23-11-23
-<<<<<<< HEAD
 # Fecha última modificación: 23-11-23
 # Licencia: GPL-3.0
 
@@ -73,35 +72,3 @@ minúsculas. Al tratarse de variables nominales no se hace uso de codificación 
   Por ende, en caso de per.hog == '' (o NA) se remplaza por la media, esto es:
    per.hog_i ∉ Dominio ⇒ per.hog_i := x̄(per.hog)
   Donde x̄(per.hog) = (Σper.hog_i)/N
-=======
-# Fecha última modificación: 2-12-23
-# Licencia: GPL-3.0
-
-# Reglas de Consistencia para BD_huella.txt usando editrules
-
-# Rango de Edad
-edad >= 10
-edad <= 20
-
-# Consistencia de Género
-genero %in% c("femenino", "masculino")
-
-# Consistencia de Zona
-zona %in% c("urbano", "rural")
-
-# Consistencia de Grado Escolar
-grado %in% c("sexto", "séptimo", "octavo", "noveno", "décimo", "once")
-
-# Consistencia en comp_HHD
-comp_HHD %in% c("uso_baño", "riego_jardin", "uso_cocina", "lavado_ropa")
-
-# Consistencia en comp_HHI
-comp_HHI %in% c("carne", "fruta", "café")
-
-# Validez de Huella Hídrica Directa e Indirecta (HHD y HHI)
-HHD > 0
-HHI > 0
-
-# Consistencia en Número de Personas en el Hogar (per.hog)
-per.hog > 0
->>>>>>> main
