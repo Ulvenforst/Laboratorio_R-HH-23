@@ -3,7 +3,7 @@
 # Autores: Juan Camilo Narváez Tascón, 2140112-3743
 #          Óscar David Cuaical, 2270657-3743
 # Fecha creación: 23-11-23
-# Fecha última modificación: 25-11-23
+# Fecha última modificación: 2-12-23
 # Licencia: GPL-3.0
 
 # Reglas de Consistencia para BD_huella.txt usando editrules
