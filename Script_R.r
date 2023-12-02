@@ -15,6 +15,8 @@
 
 # -------------------------------------------------------------------------
 # Librerías necesarias
+# install.packages("visdat") # Se recomienda última versión.
+# install.packages("rmarkdown")
 # install.packages("dplyr") # Se recomienda última versión.
 # install.packages("editrules") # Se recomienda última versión.
 # install.packages("tidyr") # Se recomienda última versión.

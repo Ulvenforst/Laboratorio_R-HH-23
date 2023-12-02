@@ -1,0 +1,200 @@
+---
+title: "Laboratorio, Preprocesamiento de datos con R, Probabilidad y Estadística"
+author:
+  - "Juan Camilo Narváez Tascón, 2140112-3743"
+  - "Óscar David Cuaical, 2270657-3743"
+date: "Fecha creación: 21-11-23; Última modificación: 2-12-23"
+license: "GPL-3.0"
+output: 
+  html_document: default
+---
+## Historia
+Se desea caracterizar la huella hídrica de una institución de educación secundaria, se dispone de la base de datos `data/BD_huella.txt`, la cual contiene información de los estudiantes como: edad, género, zona, grado escolar, cantidad de HH directa e indirecta en $m^3$/año (`HHD` y `HHI`), el mayor componente de la HH directa e indirecta (`comp_HHD` y `comp_HHI`), y el número de personas que habitan en el hogar (`per.hog`).
+
+Las variables cualitativas deben seguir la siguiente codificación:
+
+| Atributo | Valor                                  |
+|----------|----------------------------------------|
+| genero   | 1=femenino; 2=masculino                |
+| zona     | 1=urbano; 2=rural                      |
+| grado    | 6=sexto; 7=séptimo; 8=octavo; 9=noveno; 10=décimo; 11=once |
+
+## Preprocesamiento y Limpieza de Datos
+### 1.1 Verificación técnica de datos
+Al revisar `BD_huella.txt` podremos notar que los titulares de los encabezados son correspondientes a los datos de cada propiedad, guardando una relación entre ellos, así que de manera general contamos con una base de datos correcta. También podremos notar que hace falta un preprocesamiento debido a datos faltantes o formatos no establecidos para mantener una consistencia. 
+
+```{r echo=FALSE, message=FALSE}
+# Librerías que se usarán
+library(editrules)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(visdat)
+
+# Cargar los datos (ajusta la ruta del archivo según sea necesario)
+datos <- read.csv("../Data/BD_huella.txt", header = TRUE, sep = "\t")
+
+head(datos)
+```
+
+### 1.2 Ecuaciones de consistencia
+Empezamos aplicando la codificación definida para las variables cualitativas, y factorizándolas para futuras aplicaciones; la codificación será etiquetada para una mejor lectura. Consiguiente se define un formato general para las propiedades, estableciendo así una consistencia entre estas, se deben considerar cambios sutiles como tildes o mayúsculas.
+Las reglas matemáticas que permitirán esta consistencia están dadas por:
+
+1. **Rango de Edad**: La edad de los estudiantes debe ser razonable para el nivel de educación secundaria: $\{\forall \texttt{edad} \in \Bbb{Z} \mid 10 \leqslant \texttt{edad} \leqslant 20\}$
+
+2. **Consistencia de Género**: El género debe ser femenino (1) o masculino (2), tras la transformación realizada:
+  
+   $\{\forall \texttt{genero} \in \{\texttt{'1', '2'}\} 
+   \\\mid \texttt{genero_i} := \texttt{'1'} \Leftrightarrow (\texttt{genero_i == 'femenino'} \vee \texttt{'1'}) 
+   \\\oplus \texttt{genero_i} := \texttt{'2'} \Leftrightarrow (\texttt{genero_i == 'masculino'} \vee \texttt{'2'})\}$
+
+3. **Consistencia de Zona**: La zona debe ser urbana (1) o rural (2), de acuerdo con la recodificación:
+
+   $\{\forall\texttt{zona} \in \{\texttt{'1', '2'}\} 
+   \\\mid \texttt{zona_i} := \texttt{'1'} \Leftrightarrow (\texttt{zona_i == 'urbano'} \vee \texttt{'1'})
+   \\⊕ \texttt{zona_i} := \texttt{'2'} \Leftrightarrow (\texttt{zona_i == 'rural'} ∨ \texttt{'2'})\}$
+  
+4. **Consistencia de Grado Escolar**: El grado escolar debe estar entre sexto (6) y once (11), según la recodificación.
+
+   $\{∀\texttt{grado} ∈ \{\texttt{'6', '7', '8', '9', '10', '11'}\} 
+   \\\mid \texttt{grado_i} := \texttt{'6'} \Leftrightarrow (\texttt{grado_i == 'sexto'} ∨ \texttt{'6'}) 
+   \\⊕ \texttt{grado_i} := \texttt{'7'} \Leftrightarrow (\texttt{grado_i == 'septimo'} ∨ \texttt{'7'})
+   \\⊕ \texttt{grado_i} := \texttt{'8'} \Leftrightarrow (\texttt{grado_i == 'octavo'}∨ \texttt{'8'})
+   \\⊕ \texttt{grado_i} := \texttt{'9'} \Leftrightarrow (\texttt{grado_i == 'noveno'}∨ \texttt{'9'})
+   \\⊕ \texttt{grado_i} := \texttt{'10'} \Leftrightarrow (\texttt{grado_i == 'decimo'} ∨ \texttt{'10'})
+   \\⊕ \texttt{grado_i} := \texttt{'11'} \Leftrightarrow (\texttt{grado_i == 'once'} ∨ \texttt{'11'})\}$
+
+5. **Consistencia en `comp_HHD` y `comp_HHI`**; no deben haber variaciones textuales de un mismo componente, por ende se usan
+minúsculas. Al tratarse de variables nominales no se hace uso de codificación y se respeta el formato establecido:
+$\{∀\texttt{comp_HHD} ∈ \{\texttt{'uso_baño','lavado_ropa','uso_cocina',...,
+}\\\texttt{'〈actividad〉〈separador〉〈lugar〉'\} | 〈separador〉 := '_'\}}\\
+   \{∀\texttt{comp_HHI} ∈ \{\texttt{'carne','fruta','cafe',...,〈componente〉}\}\}$
+
+
+6. **Validez de Huella Hídrica Directa e Indirecta (`HHD` y `HHI`)**: Estos valores deben ser positivos y lógicos.
+   $Dominio = \{\texttt{HHD, HHI} ∈ ℝ⁺ \mid \texttt{HHD} > 0 ∧ \texttt{HHI} > 0\}$
+   
+   Además, si `HHI`, `HHD` == `''` (o `NA`) se remplaza por una regresión lineal, esto es:
+
+   $\texttt{HHD_i} ∉ Dominio ⇒ \texttt{HHD_i :=} f_{RL}(\texttt{HHD_i})\\
+   \texttt{HHI_i} ∉ Dominio ⇒ \texttt{HHI_i :=} f_{RL}(\texttt{HHI_i})$
+
+   $f_{RL}(x)$ representa la función de regresión lineal aplicada para estimar los valores faltantes de `HHD` o `HHI`, esto es:
+
+   $f_{RL}(x) = a + (b_1 × x_1) + (b_2 × x_2) + ... + (b_n × x_n) + ε$
+
+   Donde $a es el término de intercepción, que representa el valor esperado de $f_{RL}$ cuando todas las $x_i$ son cero. $b_i$ son los coeficientes de regresión asociados con cada variable independiente, que representan el cambio esperado en $f_{RL}$ por una unidad de cambio en $x_i$, manteniendo las demás $x$ constantes. $ε$ es el término de error, que representa la variación en $f_{RL}$ no explicada por las variables independientes. Se asume que $ε$ tiene una distribución normal con media cero y varianza constante (homocedasticidad).
+
+7. **Consistencia en Número de Personas en el Hogar (`per.hog`)**: Debe ser un número positivo y lógico. 
+
+   $Dominio = \{\texttt{per.hog} ∈ ℤ \mid \texttt{per.hog} > 0\}$
+
+   Por ende, en caso de `per.hog` == `''` (o `NA`) se remplaza por la media, esto es:
+   $\texttt{per.hog_i} ∉ Dominio ⇒ \texttt{per.hog_i :=} x̄(texttt{per.hog})$
+   Donde $x̄(\texttt{per.hog}) = (Σ\texttt{per.hog_i})/N$
+
+
+Todas estas reglas son implementadas en `consistencia.txt`, adaptadas a la librería `editrules`, la cual se usa para verificar que los datos cumplan con las reglas establecidas.
+
+### 1.3 Aplicación de reglas de consistencia
+
+Si omitimos parte de la regla 6 y 7 de momento, las cuales corresponden a llenar datos faltantes y solo tenemos en cuenta el dominio establecido, al aplicar estas reglas tenemos:
+
+```{r echo=FALSE}
+# Limpieza de datos y calificación de variables cualitativas
+datos <- datos %>%
+  mutate(
+    genero = iconv(as.character(genero), to = "ASCII//TRANSLIT"),
+    zona = iconv(as.character(zona), to = "ASCII//TRANSLIT"),
+    grado = iconv(as.character(grado), to = "ASCII//TRANSLIT"),
+    genero = tolower(genero),
+    zona = tolower(zona),
+    grado = tolower(grado),
+    genero = case_when(genero %in% c("femenino", "1") ~ "1",
+                       genero %in% c("masculino", "2") ~ "2",
+                       TRUE ~ NA_character_),
+    zona = case_when(zona %in% c("urbano", "1") ~ "1",
+                     zona %in% c("rural", "2") ~ "2",
+                     TRUE ~ NA_character_),
+    grado = case_when(grado %in% c("6", "sexto") ~ "6",
+                      grado %in% c("7", "septimo") ~ "7",
+                      grado %in% c("8", "octavo") ~ "8",
+                      grado %in% c("9", "noveno") ~ "9",
+                      grado %in% c("10", "decimo") ~ "10",
+                      grado %in% c("11", "once") ~ "11",
+                      TRUE ~ NA_character_),
+    genero = factor(genero, levels = c("1", "2"), labels = c("femenino", "masculino")),
+    zona = factor(zona, levels = c("1", "2"), labels = c("urbano", "rural")),
+    grado = factor(grado, levels = c("6", "7", "8", "9", "10", "11"), labels = c("sexto", "séptimo", "octavo", "noveno", "décimo", "once")),
+    comp_HHD = tolower(gsub("[._]", "_", comp_HHD)),
+    comp_HHI = tolower(comp_HHI)
+  )
+  head(datos)
+```
+
+De momento se omite la muestra de la tabla completa debido a su tamaño, sin embargo con esta muestra podemos observar una mayor consistencia con respecto a la muestra anterior, en el `ID` 6 todavía se observa un dato faltante `NA`, pero podemos notar el correcto etiquetado de cada propiedad. Si queremos ver el resumen de los datos validos usando `editrules` tenemos:
+```{r echo=FALSE}
+# Reglas de validación
+rules <- editrules::editfile("consistencia.txt")
+Valid_Data <- editrules::violatedEdits(rules, datos)
+summary(Valid_Data)
+```
+
+### 1.4 Estudio de datos faltantes
+En el punto 1.3 observamos que las reglas establecidas aún no se cumplen, esto puede deberse a los datos faltantes de `HHD`, `HHI` y `per.hogar`, que constituyen el 1.8% de la totalidad de nuestros datos:
+
+```{r datos-faltantes, echo=FALSE, message=FALSE, warning=FALSE}
+# Visualización de datos faltantes
+visdat::vis_miss(datos)
+```
+
+### 1.5 Estudio de datos atípicos
+
+Es útil identificar los datos atípicos, de manera que al momento de remplazar los datos faltantes estos sean más confiables. Al visualizar las variables cuantitativas de manera genera podremos notar comportamientos relativos a datos atípicos y de esta manera se podrá estudiar dicha propiedad de manera más específica:
+
+
+```{r identificar-outliers, echo=FALSE, message=FALSE, warning=FALSE}
+# Identificar variables cuantitativas de interés
+variables_interes <- c("edad", "HHD", "HHI", "per.hog")
+
+# Ajustar los márgenes y el número de gráficos por ventana gráfica
+par(mfrow=c(2, 2), mar=c(4, 4, 2, 1))
+
+# Visualización de datos atípicos para cada variable cuantitativa
+for (var in variables_interes) {
+  # Histograma
+  hist(datos[[var]], main=paste("Histograma de", var), xlab=var, col="lightblue")
+
+  # Boxplot
+  boxplot(datos[[var]], horizontal=TRUE, main=paste("Boxplot de", var), xlab=var, col="lightgreen")
+}
+```
+
+Podemos observar que la edad cumple con nuestras reglas establecidas, y no hay datos atípicos. Para `HHD`, `HHI` y `per.hogar` podemos intuir comportamientos respectivos a datos atípicos. Dado que todos nuestros datos son positivos podemos calcular solo los cercos superiores (estos pueden visualizarse en los boxplot) y hacer un conteo de estos datos atípicos, permitiéndonos una mejor comprensión de los mismos:
+
+```{r echo=FALSE, message=FALSE}
+# Función para calcular y mostrar el cerco superior de una variable y contar datos atípicos
+calcular_cerco_superior_y_conteo <- function(variable) {
+  Q3 <- quantile(datos[[variable]], 0.75, na.rm = TRUE)
+  IQR <- IQR(datos[[variable]], na.rm = TRUE)
+  upper_bound <- Q3 + 1.5 * IQR
+  conteo_atipicos <- sum(datos[[variable]] > upper_bound, na.rm = TRUE)
+  mensaje <- paste("Cerco superior de", variable, ":", upper_bound, "; Número de datos atípicos:", conteo_atipicos)
+  return(mensaje)
+}
+
+# Calcular y mostrar el cerco superior y el conteo de datos atípicos para HHD
+mensaje_HHD <- calcular_cerco_superior_y_conteo("HHD")
+print(mensaje_HHD)
+
+# Calcular y mostrar el cerco superior y el conteo de datos atípicos para HHI
+mensaje_HHI <- calcular_cerco_superior_y_conteo("HHI")
+print(mensaje_HHI)
+
+# Calcular y mostrar el cerco superior y el conteo de datos atípicos para per.hog
+mensaje_per_hog <- calcular_cerco_superior_y_conteo("per.hog")
+print(mensaje_per_hog)
+```
+
+
