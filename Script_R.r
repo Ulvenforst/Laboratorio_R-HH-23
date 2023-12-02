@@ -3,7 +3,7 @@
 # Autores: Juan Camilo Narváez Tascón, 2140112-3743
 #          Óscar David Cuaical, 2270657-3743
 # Fecha creación: 21-11-23
-# Fecha última modificación: 23-11-23
+# Fecha última modificación: 2-12-23
 # Licencia: GPL-3.0
 
 # Historia: Se desea caracterizar la huella hídrica de una institución de
@@ -26,7 +26,7 @@ library(tidyr)
 library(ggplot2)
 
 # Carga de datos
-datos <- read.csv("data/BD_Huella.txt", header = TRUE, sep = "\t")
+datos <- read.csv("Data/BD_Huella.txt", header = TRUE, sep = "\t")
 
 # Limpieza de datos y calificación de variables cualitativas
 datos <- datos %>%
@@ -74,6 +74,6 @@ datos <- datos %>%
   mutate(per.hog = ifelse(is.na(per.hog) | per.hog <= 0, mean_per_hog, per.hog))
 
 # Reglas de validación
-rules <- editrules::editfile("informe/consistencia.txt")
+rules <- editrules::editfile("Informe/consistencia.txt")
 Valid_Data <- editrules::violatedEdits(rules, datos)
 summary(Valid_Data)
