@@ -59,6 +59,28 @@ datos <- datos %>%
     comp_HHI = tolower(comp_HHI)
   )
 
+# Función para reemplazar datos atípicos con NA
+reemplazar_atipicos_con_NA <- function(data, variable) {
+    Q3 <- quantile(data[[variable]], 0.75, na.rm = TRUE)
+    IQR <- IQR(data[[variable]], na.rm = TRUE)
+    upper_bound <- Q3 + 1.5 * IQR
+
+    # Reemplazar datos que exceden el cerco superior con NA
+    data[[variable]][data[[variable]] >= upper_bound] <- NA
+    return(data)
+}
+
+# Aplicar la función a HHD y per.hog
+datos <- reemplazar_atipicos_con_NA(datos, "HHD")
+datos <- reemplazar_atipicos_con_NA(datos, "per.hog")
+
+# Imputar valores faltantes para HHD y per.hog con la media de cada variable
+mean_HHD <- mean(datos$HHD, na.rm = TRUE)
+mean_per_hog <- mean(datos$per.hog, na.rm = TRUE)
+
+datos$HHD[is.na(datos$HHD)] <- mean_HHD
+datos$per.hog[is.na(datos$per.hog)] <- mean_per_hog
+
 # Modelos de regresión lineal para HHD y HHI
 modelo_HHD <- lm(HHD ~ edad + genero + zona + grado + per.hog, data = datos)
 modelo_HHI <- lm(HHI ~ edad + genero + zona + grado + per.hog, data = datos)
@@ -66,16 +88,24 @@ modelo_HHI <- lm(HHI ~ edad + genero + zona + grado + per.hog, data = datos)
 # Aplicación de los modelos para estimar HHD y HHI
 datos <- datos %>%
   mutate(
-    HHD = ifelse(is.na(HHD) | HHD <= 0, round(predict(modelo_HHD, newdata = datos)), HHD),
-    HHI = ifelse(is.na(HHI) | HHI <= 0, round(predict(modelo_HHI, newdata = datos)), HHI)
+    HHD = ifelse(is.na(HHD) | HHD <= 0, predict(modelo_HHD, newdata = datos), HHD),
+    HHI = ifelse(is.na(HHI) | HHI <= 0, predict(modelo_HHI, newdata = datos), HHI)
+  ) %>%
+  mutate(
+    HHD = round(HHD),
+    HHI = round(HHI)
   )
 
 # Limpieza de per.hog
-mean_per_hog <- round(mean(datos$per.hog, na.rm = TRUE))
-datos <- datos %>%
-  mutate(per.hog = ifelse(is.na(per.hog) | per.hog <= 0, mean_per_hog, per.hog))
+datos$per.hog <- ifelse(is.na(datos$per.hog) | datos$per.hog <= 0, mean_per_hog, datos$per.hog)
+datos$per.hog <- round(datos$per.hog)
+
 
 # Reglas de validación
 rules <- editrules::editfile("Informe/consistencia.txt")
 Valid_Data <- editrules::violatedEdits(rules, datos)
 summary(Valid_Data)
+
+# Guardar datos limpios
+# ruta <- "Data/clean_huella.txt"
+# write.table(datos, file = ruta, sep = "\t", row.names = FALSE, na = "")

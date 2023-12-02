@@ -19,7 +19,7 @@ Las variables cualitativas deben seguir la siguiente codificación:
 | zona     | 1=urbano; 2=rural                      |
 | grado    | 6=sexto; 7=séptimo; 8=octavo; 9=noveno; 10=décimo; 11=once |
 
-## Preprocesamiento y Limpieza de Datos
+## 1 Preprocesamiento y Limpieza de Datos
 ### 1.1 Verificación técnica de datos
 Al revisar `BD_huella.txt` podremos notar que los titulares de los encabezados son correspondientes a los datos de cada propiedad, guardando una relación entre ellos, así que de manera general contamos con una base de datos correcta. También podremos notar que hace falta un preprocesamiento debido a datos faltantes o formatos no establecidos para mantener una consistencia. 
 
@@ -153,7 +153,6 @@ visdat::vis_miss(datos)
 
 Es útil identificar los datos atípicos, de manera que al momento de remplazar los datos faltantes estos sean más confiables. Al visualizar las variables cuantitativas de manera genera podremos notar comportamientos relativos a datos atípicos y de esta manera se podrá estudiar dicha propiedad de manera más específica:
 
-
 ```{r identificar-outliers, echo=FALSE, message=FALSE, warning=FALSE}
 # Identificar variables cuantitativas de interés
 variables_interes <- c("edad", "HHD", "HHI", "per.hog")
@@ -174,27 +173,110 @@ for (var in variables_interes) {
 Podemos observar que la edad cumple con nuestras reglas establecidas, y no hay datos atípicos. Para `HHD`, `HHI` y `per.hogar` podemos intuir comportamientos respectivos a datos atípicos. Dado que todos nuestros datos son positivos podemos calcular solo los cercos superiores (estos pueden visualizarse en los boxplot) y hacer un conteo de estos datos atípicos, permitiéndonos una mejor comprensión de los mismos:
 
 ```{r echo=FALSE, message=FALSE}
-# Función para calcular y mostrar el cerco superior de una variable y contar datos atípicos
-calcular_cerco_superior_y_conteo <- function(variable) {
-  Q3 <- quantile(datos[[variable]], 0.75, na.rm = TRUE)
-  IQR <- IQR(datos[[variable]], na.rm = TRUE)
-  upper_bound <- Q3 + 1.5 * IQR
-  conteo_atipicos <- sum(datos[[variable]] > upper_bound, na.rm = TRUE)
-  mensaje <- paste("Cerco superior de", variable, ":", upper_bound, "; Número de datos atípicos:", conteo_atipicos)
-  return(mensaje)
+# Función para calcular el cerco superior y contar datos atípicos, y luego imprimir el resultado
+calcular_cerco_superior_y_conteo <- function(data, variable) {
+    Q3 <- quantile(data[[variable]], 0.75, na.rm = TRUE)
+    IQR <- IQR(data[[variable]], na.rm = TRUE)
+    upper_bound <- Q3 + 1.5 * IQR
+    conteo_atipicos <- sum(data[[variable]] > upper_bound, na.rm = TRUE)
+
+    mensaje <- paste("Cerco superior de", variable, ":", upper_bound, "; Número de datos atípicos:", conteo_atipicos)
+    print(mensaje)
 }
 
-# Calcular y mostrar el cerco superior y el conteo de datos atípicos para HHD
-mensaje_HHD <- calcular_cerco_superior_y_conteo("HHD")
-print(mensaje_HHD)
-
-# Calcular y mostrar el cerco superior y el conteo de datos atípicos para HHI
-mensaje_HHI <- calcular_cerco_superior_y_conteo("HHI")
-print(mensaje_HHI)
-
-# Calcular y mostrar el cerco superior y el conteo de datos atípicos para per.hog
-mensaje_per_hog <- calcular_cerco_superior_y_conteo("per.hog")
-print(mensaje_per_hog)
+# Aplicar la función a las variables de interés
+calcular_cerco_superior_y_conteo(datos, "HHD")
+calcular_cerco_superior_y_conteo(datos, "HHI")
+calcular_cerco_superior_y_conteo(datos, "per.hog")
 ```
 
+### 1.6 Corrección de datos
+Identificados los datos atípicos procederemos a eliminarlos dejándolos como faltantes, para consiguiente implementar las ecuación de relleno establecidas en el punto 1.2.
 
+```{r echo=FALSE}
+# Función para reemplazar datos atípicos con NA
+reemplazar_atipicos_con_NA <- function(data, variable) {
+    Q3 <- quantile(data[[variable]], 0.75, na.rm = TRUE)
+    IQR <- IQR(data[[variable]], na.rm = TRUE)
+    upper_bound <- Q3 + 1.5 * IQR
+
+    # Reemplazar datos que exceden el cerco superior con NA
+    data[[variable]][data[[variable]] >= upper_bound] <- NA
+    return(data)
+}
+
+# Aplicar la función a HHD y per.hog
+datos <- reemplazar_atipicos_con_NA(datos, "HHD")
+datos <- reemplazar_atipicos_con_NA(datos, "per.hog")
+
+# Imputar valores faltantes para HHD y per.hog con la media de cada variable
+mean_HHD <- mean(datos$HHD, na.rm = TRUE)
+mean_per_hog <- mean(datos$per.hog, na.rm = TRUE)
+
+datos$HHD[is.na(datos$HHD)] <- mean_HHD
+datos$per.hog[is.na(datos$per.hog)] <- mean_per_hog
+```
+
+Al volver a graficar `HHD` y `per.hogar` notaremos que ahora los datos se encuentran dentro del límite identificado por el cerco superior. En este punto los valores de los cercos pueden variar si se vuelven a cualcular debido a la eliminación de extremos, sin embargo podemos estar seguros de contar con datos menos variados:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE}
+# Identificar variables cuantitativas de interés
+variables_interes <- c("HHD", "per.hog")
+
+# Ajustar los márgenes y el número de gráficos por ventana gráfica
+par(mfrow=c(1, 2), mar=c(4, 4, 2, 1))
+
+# Visualización de datos atípicos para cada variable cuantitativa
+for (var in variables_interes) {
+  # Histograma
+  hist(datos[[var]], main=paste("Histograma de", var), xlab=var, col="lightblue")
+
+}
+```
+
+Hemos decidido remplazar los datos faltantes de `HHD` y `HHI` con una regresión lineal debido a que la naturaleza de estos valores suele variar entre números muy grandes, y su varianza suele ser mayor. Lo contrario sucede con `per.hogar` la cual puede ser remplazada simplemente por la media.
+
+```{R echo=FALSE, message=FALSE, warning=FALSE}
+# Modelos de regresión lineal para HHD y HHI
+modelo_HHD <- lm(HHD ~ edad + genero + zona + grado + per.hog, data = datos)
+modelo_HHI <- lm(HHI ~ edad + genero + zona + grado + per.hog, data = datos)
+
+# Aplicación de los modelos para estimar HHD y HHI
+datos <- datos %>%
+  mutate(
+    HHD = ifelse(is.na(HHD) | HHD <= 0, predict(modelo_HHD, newdata = datos), HHD),
+    HHI = ifelse(is.na(HHI) | HHI <= 0, predict(modelo_HHI, newdata = datos), HHI)
+  ) %>%
+  mutate(
+    HHD = round(HHD),
+    HHI = round(HHI)
+  )
+
+# Limpieza de per.hog
+datos$per.hog <- ifelse(is.na(datos$per.hog) | datos$per.hog <= 0, mean_per_hog, datos$per.hog)
+datos$per.hog <- round(datos$per.hog)
+
+# Visualización de datos faltantes
+visdat::vis_miss(datos)
+
+```
+
+Podemos observar entonces que ya no tenemos datos faltantes, y si ahora volvemos a validar las reglas tendremos
+
+```{r echo=FALSE, warning=FALSE}
+# Reglas de validación
+Valid_Data <- editrules::violatedEdits(rules, datos)
+summary(Valid_Data)
+```
+
+Hemos limpiado los datos de manera que cumplan con las reglas establecidas en el punto 1.2, eliminando datos atípicos y faltantes, y factorizando las variables cualitativas que lo solicitaban.
+```{R echo=FALSE}
+# knitr::kable(datos)
+head(datos)
+
+# ruta <- "../Data/clean_huella.txt"
+# write.table(datos, file = ruta, sep = "\t", row.names = FALSE, na = "")
+
+```
+
+En esta muestra no se alcanzan a visualizar todos los cambios, esto por efectos prácticos y que el documento no quede tan largo, puede encontrar la base de datos limpia en `clean_huella.txt`
