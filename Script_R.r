@@ -100,7 +100,6 @@ datos <- datos %>%
 datos$per.hog <- ifelse(is.na(datos$per.hog) | datos$per.hog <= 0, mean_per_hog, datos$per.hog)
 datos$per.hog <- round(datos$per.hog)
 
-
 # Reglas de validación
 rules <- editrules::editfile("Informe/consistencia.txt")
 Valid_Data <- editrules::violatedEdits(rules, datos)
