@@ -158,6 +158,13 @@ ruta <- "Data/clean_huella.csv"
 # Carga de datos limpios
 datos <- read.csv(ruta, header = TRUE)
 
+# Creacion de las nuevas variables HHT Y HHT_clas
+datos$HHT <- datos$HHD + datos$HHI
+datos$HHT_clas <- cut(datos$HHT,
+                      breaks = c(-Inf, 1789, 1887, Inf),
+                      labels = c("bajo", "medio", "alto"),
+                      include.lowest = TRUE)
+
 # 2.1 Distribuciones
 # Asegurándonos de que los nombres de los ejes y las etiquetas estén presentes y claros
 bp_theme <- theme(
