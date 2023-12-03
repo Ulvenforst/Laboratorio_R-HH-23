@@ -188,6 +188,12 @@ bp_HHI <- ggplot(datos, aes(x = comp_HHI, y = HHI)) +
   labs(title = "Boxplot de HHI por Componente", x = "Componente de HHI", y = "HHI") +
   bp_theme
 
+bp_HHT <- ggplot(datos, aes(x = HHT_clas, y = HHT)) + 
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Boxplot de HHT por clasificacion", x = "clasifiacion HHT", y = "HHT") +
+  bp_theme
+
 # Crear los gráficos de distribución
 p_HHD <- ggplot(datos, aes(x = HHD)) +
   geom_histogram(aes(y = ..density..), binwidth = 10, fill = "blue", color = "black", alpha = 0.5) +
@@ -203,6 +209,14 @@ p_HHI <- ggplot(datos, aes(x = HHI)) +
   labs(title = "Distribución de HHI", x = "HHI", y = "Densidad") +
   bp_theme
 
+p_HHT <- ggplot(datos, aes(x = HHT)) +
+  geom_histogram(aes(y = ..density..), binwidth = 20, fill = "orange", color = "black", alpha = 0.5) +
+  geom_density(color = "red", size = 1) +
+  theme_minimal() +
+  labs(title = "Distribución de HHT", x = "HHT", y = "Densidad") +
+  bp_theme
+
+
 # Organizar las gráficas en un solo panel con x11
 x11()
-grid.arrange(p_HHD, bp_HHD, p_HHI, bp_HHI, ncol = 2, nrow = 2)
+grid.arrange(p_HHD, bp_HHD, p_HHI, bp_HHI, p_HHT, bp_HHT, ncol = 3, nrow = 2)
