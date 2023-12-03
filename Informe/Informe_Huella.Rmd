@@ -3,7 +3,7 @@ title: "Laboratorio, Preprocesamiento de datos con R, Probabilidad y Estadístic
 author:
   - "Juan Camilo Narváez Tascón, 2140112-3743"
   - "Óscar David Cuaical, 2270657-3743"
-date: "Fecha creación: 21-11-23; Última modificación: 2-12-23"
+date: "Fecha creación: 21-11-23; Última modificación: 3-12-23"
 license: "GPL-3.0"
 output: 
   html_document: default

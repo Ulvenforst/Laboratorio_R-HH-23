@@ -1,0 +1,77 @@
+# Laboratorio, Preprocesamiento de datos con R, Probabilidad y Estadística.
+# Archivo: consistencia.txt
+# Autores: Juan Camilo Narváez Tascón, 2140112-3743
+#          Óscar David Cuaical, 2270657-3743
+# Fecha creación: 3-12-23
+# Fecha última modificación: 3-12-23
+# Licencia: GPL-3.0
+
+### **Inicialización y Carga de Datos:**
+Se cargaron los paquetes necesarios en R para el manejo de datos y visualizaciones. 
+Luego, se leyó la base de datos `BD_huella.txt` usando `read.csv`, lo que implicó la importación 
+de la base de datos de la huella hídrica de estudiantes en una institución educativa.
+
+
+### **Transformación y Estandarización de Datos Cualitativos:**
+Las variables categóricas `genero`, `zona` y `grado` fueron procesadas para estandarizar su formato. 
+Esto incluyó la conversión de caracteres a codificación ASCII para evitar problemas con caracteres 
+especiales o acentos, y la transformación de todos los textos a minúsculas para mantener la consistencia. 
+Se reasignaron los valores textuales a codificaciones numéricas predefinidas para su uso en análisis 
+estadísticos, donde cualquier dato no reconocido fue marcado como `NA`, representando un valor faltante 
+o no disponible. Esto por medio de la tabla
+
+| Atributo | Valor                                  			|
+|----------|------------------------------------------------------------|
+| genero   | 1=femenino; 2=masculino                			|
+| zona     | 1=urbano; 2=rural                      			|
+| grado    | 6=sexto; 7=séptimo; 8=octavo; 9=noveno; 10=décimo; 11=once |
+
+
+### **Codificación y Factores, normalización de Componentes de Huella Hídrica:**
+Estas variables cualitativas fueron convertidas a factores, que en R son variables categóricas utilizadas 
+en modelos estadísticos. Se asignaron etiquetas legibles para `genero`, `zona` y `grado`, proporcionando 
+una representación clara de cada categoría. Se normalizaron los nombres de los componentes de la huella 
+hídrica (`comp_HHD` y `comp_HHI`), asegurando que no hubiera inconsistencias debidas a mayúsculas, minúsculas 
+o caracteres especiales.
+Este paso se implementó teniendo en cuenta las ecuaciones matemáticas establecidas en 
+`consistencia_matemática.txt`, que definen el dominio de cada propiedad.
+
+
+### **Manejo de Datos Atípicos:**
+Se aplicó una función para identificar y manejar datos atípicos en las variables `HHD` y `per.hog`. 
+Los datos atípicos son valores extremos que se desvían significativamente del resto de los datos y pueden 
+sesgar el análisis. Se calculó un límite, conocido como el cerco superior, que es una medida estadística 
+que ayuda a identificar estos valores extremos. Los valores que excedían este límite fueron reemplazados 
+por `NA`, indicando que son atípicos y deben ser tratados con precaución en análisis subsiguientes.
+
+
+### **Imputación de Datos Faltantes:**
+Se calculó la media de `HHD` y `per.hog`, excluyendo los valores `NA`, y luego se utilizó este promedio para 
+reemplazar los valores faltantes. Este paso es crucial porque los modelos estadísticos generalmente no pueden 
+manejar valores `NA`, y la imputación con la media es una técnica estándar para preservar la estructura general 
+de los datos.
+
+
+### **Modelado y Estimación:**
+Se ajustaron modelos de regresión lineal para `HHD` y `HHI` utilizando las variables `edad`, `genero`, `zona`, 
+`grado` y `per.hog` como predictores. Estos modelos se usaron para predecir valores para `HHD` y `HHI` cuando 
+los datos originales eran faltantes o no válidos (menores o iguales a cero). Los valores predichos fueron 
+redondeados para mantener la coherencia con la naturaleza de los datos originales, que presumiblemente son 
+enteros o cuentas discretas.
+
+
+### **Limpieza Adicional y Redondeo:**
+Además, se realizó una limpieza adicional de la variable `per.hog`, reemplazando los valores no válidos o faltantes 
+con la media calculada y redondeando todos los valores para garantizar que los datos sean discretos y manejables.
+
+
+### **Validación de Datos:**
+Se aplicaron reglas de validación externas desde `consistencia.txt` para identificar cualquier otra violación de 
+las reglas de datos que pudieran haber quedado después de la limpieza. Esto ayuda a garantizar que los datos estén 
+en un formato adecuado y sean consistentes con las expectativas del análisis.
+
+
+### **Almacenamiento de Datos Limpios:**
+Finalmente, se preparó el código para guardar el conjunto de datos limpio en un nuevo archivo `clean_huella.txt`, 
+lo que permite una fácil reutilización y análisis en el futuro. Este paso concluye el proceso de limpieza y 
+preparación de datos, asegurando que el conjunto de datos esté listo para análisis más avanzados.
