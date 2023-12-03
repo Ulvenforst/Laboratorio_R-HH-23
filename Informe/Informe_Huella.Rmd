@@ -280,8 +280,9 @@ Hemos limpiado los datos de manera que cumplan con las reglas establecidas en el
 # knitr::kable(datos)
 head(datos)
 
-# ruta <- "../Data/clean_huella.txt"
-# write.table(datos, file = ruta, sep = "\t", row.names = FALSE, na = "")
+# 1.7 Base de datos limpia
+ruta <- "../Data/clean_huella.csv"
+# write.csv(datos, file = ruta, row.names = FALSE, na = "")
 ```
 
 En esta muestra no se alcanzan a visualizar todos los cambios, esto por efectos prácticos y que el documento no quede tan largo, puede encontrar la base de datos limpia en `clean_huella.txt`
@@ -290,7 +291,7 @@ En esta muestra no se alcanzan a visualizar todos los cambios, esto por efectos 
 
 ```{r echo=FALSE, message=FALSE}
 # Cargar los datos limpios
-datos <- read.csv("../Data/clean_huella.txt", header = TRUE, sep = "\t")
+datos <- read.csv(ruta, header = TRUE)
 ```
 
 ### 2.1 Gráficas de distribuciones de Huella Hídrica

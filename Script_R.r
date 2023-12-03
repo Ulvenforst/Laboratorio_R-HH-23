@@ -153,11 +153,12 @@ Valid_Data <- editrules::violatedEdits(rules, datos)
 summary(Valid_Data)
 
 # 1.7 Guardar datos limpios
-# ruta <- "Data/clean_huella.txt"
-# write.table(datos, file = ruta, sep = "\t", row.names = FALSE, na = "")
+# ruta <- "Data/clean_huella.csv"
+# write.csv(datos, file = ruta, row.names = FALSE, na = "")
+
 
 # Carga de datos limpios
-datos <- read.csv("Data/clean_huella.txt", header = TRUE, sep = "\t")
+datos <- read.csv(ruta, header = TRUE)
 
 # 2.1 Distribuciones
 # Asegurándonos de que los nombres de los ejes y las etiquetas estén presentes y claros
