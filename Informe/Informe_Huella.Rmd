@@ -215,8 +215,23 @@ datos <- reemplazar_atipicos_con_NA(datos, "HHD")
 datos <- reemplazar_atipicos_con_NA(datos, "per.hog")
 
 # Imputar valores faltantes para HHD y per.hog con la media de cada variable
-mean_HHD <- mean(datos$HHD, na.rm = TRUE)
-mean_per_hog <- mean(datos$per.hog, na.rm = TRUE)
+mean_HHD <- round(mean(datos$HHD, na.rm = TRUE))
+mean_per_hog <- round(mean(datos$per.hog, na.rm = TRUE))
+
+# Modelos de regresión lineal para HHD y HHI
+modelo_HHD <- lm(HHD ~ edad + genero + zona + grado + per.hog, data = datos)
+modelo_HHI <- lm(HHI ~ edad + genero + zona + grado + per.hog, data = datos)
+
+# Aplicación de los modelos para estimar HHD y HHI
+datos <- datos %>%
+  mutate(
+    HHD = ifelse(is.na(HHD) | HHD <= 0, predict(modelo_HHD, newdata = datos), HHD),
+    HHI = ifelse(is.na(HHI) | HHI <= 0, predict(modelo_HHI, newdata = datos), HHI)
+  ) %>%
+  mutate(
+    HHD = round(HHD),
+    HHI = round(HHI)
+  )
 
 datos$HHD[is.na(datos$HHD)] <- mean_HHD
 datos$per.hog[is.na(datos$per.hog)] <- mean_per_hog
@@ -244,25 +259,6 @@ print(paste("Valor máximo de per.hogar:", max(datos$per.hog, na.rm = TRUE)))
 Hemos decidido remplazar los datos faltantes de `HHD` y `HHI` con una regresión lineal debido a que la naturaleza de estos valores suele variar entre números muy grandes, y su varianza suele ser mayor. Lo contrario sucede con `per.hogar` la cual puede ser remplazada simplemente por la media.
 
 ```{R echo=FALSE, message=FALSE, warning=FALSE}
-# Modelos de regresión lineal para HHD y HHI
-modelo_HHD <- lm(HHD ~ edad + genero + zona + grado + per.hog, data = datos)
-modelo_HHI <- lm(HHI ~ edad + genero + zona + grado + per.hog, data = datos)
-
-# Aplicación de los modelos para estimar HHD y HHI
-datos <- datos %>%
-  mutate(
-    HHD = ifelse(is.na(HHD) | HHD <= 0, predict(modelo_HHD, newdata = datos), HHD),
-    HHI = ifelse(is.na(HHI) | HHI <= 0, predict(modelo_HHI, newdata = datos), HHI)
-  ) %>%
-  mutate(
-    HHD = round(HHD),
-    HHI = round(HHI)
-  )
-
-# Limpieza de per.hog
-datos$per.hog <- ifelse(is.na(datos$per.hog) | datos$per.hog <= 0, mean_per_hog, datos$per.hog)
-datos$per.hog <- round(datos$per.hog)
-
 # Visualización de datos faltantes
 visdat::vis_miss(datos)
 ```
@@ -282,7 +278,7 @@ head(datos)
 
 # 1.7 Base de datos limpia
 ruta <- "../Data/clean_huella.csv"
-# write.csv(datos, file = ruta, row.names = FALSE, na = "", fileEncoding = "UTF-8")
+write.csv(datos, file = ruta, row.names = FALSE, na = "", fileEncoding = "UTF-8")
 ```
 
 En esta muestra no se alcanzan a visualizar todos los cambios, esto por efectos prácticos y que el documento no quede tan largo, puede encontrar la base de datos limpia en `clean_huella.csv`.

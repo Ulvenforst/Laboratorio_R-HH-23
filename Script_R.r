@@ -86,7 +86,6 @@ for (var in variables_interes) {
   boxplot(datos[[var]], main=paste("Boxplot de", var), xlab=var, col="lightgreen", horizontal=TRUE)
 }
 
-
 calcular_cerco_superior_y_conteo <- function(data, variable) {
     Q3 <- quantile(data[[variable]], 0.75, na.rm = TRUE)
     IQR <- IQR(data[[variable]], na.rm = TRUE)
@@ -123,11 +122,8 @@ datos <- reemplazar_atipicos_con_NA(datos, "HHD")
 datos <- reemplazar_atipicos_con_NA(datos, "per.hog")
 
 # Imputar valores faltantes para HHD y per.hog con la media de cada variable
-mean_HHD <- mean(datos$HHD, na.rm = TRUE)
-mean_per_hog <- mean(datos$per.hog, na.rm = TRUE)
-
-datos$HHD[is.na(datos$HHD)] <- mean_HHD
-datos$per.hog[is.na(datos$per.hog)] <- mean_per_hog
+mean_HHD <- round(mean(datos$HHD, na.rm = TRUE))
+mean_per_hog <- round(mean(datos$per.hog, na.rm = TRUE))
 
 # Modelos de regresión lineal para HHD y HHI
 modelo_HHD <- lm(HHD ~ edad + genero + zona + grado + per.hog, data = datos)
@@ -144,9 +140,11 @@ datos <- datos %>%
     HHI = round(HHI)
   )
 
+datos$HHD[is.na(datos$HHD)] <- mean_HHD
+datos$per.hog[is.na(datos$per.hog)] <- mean_per_hog
+
 # Limpieza de per.hog
 datos$per.hog <- ifelse(is.na(datos$per.hog) | datos$per.hog <= 0, mean_per_hog, datos$per.hog)
-datos$per.hog <- round(datos$per.hog)
 
 # 1.2 Reglas de validación
 rules <- editrules::editfile("Informe/consistencia.txt")
