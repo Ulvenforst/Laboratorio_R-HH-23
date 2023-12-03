@@ -22,6 +22,11 @@
 # install.packages("tidyr") # Se recomienda última versión.
 # install.packages("vctrs") # Se requiere una versión mayor o igual a 0.6.4
 # install.packages("ggplot2") # Se recomienda última versión.
+# install.packages("gridExtra") # Se recomienda última versión.
+# install.packages("grid") # Se recomienda última versión.
+
+library(gridExtra)
+library(grid)
 library(dplyr)
 library(editrules)
 library(tidyr)

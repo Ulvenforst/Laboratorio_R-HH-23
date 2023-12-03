@@ -30,6 +30,8 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(visdat)
+library(gridExtra)
+library(grid)
 
 # Cargar los datos (ajusta la ruta del archivo según sea necesario)
 datos <- read.csv("../Data/BD_huella.txt", header = TRUE, sep = "\t")
@@ -280,3 +282,61 @@ head(datos)
 ```
 
 En esta muestra no se alcanzan a visualizar todos los cambios, esto por efectos prácticos y que el documento no quede tan largo, puede encontrar la base de datos limpia en `clean_huella.txt`
+
+## 2 Visualización de los datos
+
+```{r echo=FALSE, message=FALSE}
+# Cargar los datos limpios
+datos <- read.csv("../Data/clean_huella.txt", header = TRUE, sep = "\t")
+```
+
+### 2.1 Gráficas de distribuciones de Huella Hídrica
+
+La gráfica que representa la Huella Hídrica Directa (HHD) muestra una distribución que parece inclinarse hacia un único pico principal, lo que sugiere que la mayoría de los estudiantes tiene un nivel de consumo de agua directo relativamente homogéneo. La presencia de un pico central y dominante puede indicar que la mayoría de los estudiantes comparten prácticas similares en cuanto al uso directo de agua. En la esquina superior derecha podemos observar un boxplot respectivo al comp_HHD en el oden `lavado_ropa`, `riego_jardin`, `uso_baño`, `uso_cocina` respectivamente. Notamos diferencias notables entre los componentes del uso del agua, como el lavado de ropa, riego de jardín, uso de baño y uso de cocina. El uso de cocina y el uso del baño parecen tener una mediana más alta y una variabilidad mayor en el consumo de agua, indicada por el rango intercuartílico más amplio y los valores atípicos (para las nuevas medidas) presentes.
+
+```{R echo=FALSE, warning=FALSE}
+# Primero, generamos los boxplots como grobs
+bp_HHD <- ggplot(datos, aes(x = factor(comp_HHD), y = HHD)) + 
+  geom_boxplot() +
+  theme_minimal() +
+  labs(x = "", y = "HHD") +
+  theme(
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  )
+
+bp_HHI <- ggplot(datos, aes(x = factor(comp_HHI), y = HHI)) + 
+  geom_boxplot() +
+  theme_minimal() +
+  labs(x = "", y = "HHI") +
+  theme(
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  )
+
+# Convertimos los ggplots a grobs
+grob_HHD <- ggplotGrob(bp_HHD)
+grob_HHI <- ggplotGrob(bp_HHI)
+
+p_HHD <- ggplot(datos, aes(x = HHD)) +
+  geom_histogram(aes(y = ..density..), binwidth = 10, fill = "blue", color = "black", alpha = 0.5) +
+  geom_density(color = "red", adjust = 1, size = 1) +
+  theme_minimal() +
+  labs(title = "Distribución de la Huella Hídrica Directa (HHD)", x = "HHD", y = "Densidad") +
+  annotation_custom(grob = grob_HHD, xmin = max(datos$HHD, na.rm = TRUE) - diff(range(datos$HHD, na.rm = TRUE))/3, xmax = max(datos$HHD, na.rm = TRUE), ymin = max(density(datos$HHD, na.rm = TRUE)$y), ymax = Inf)
+
+p_HHI <- ggplot(datos, aes(x = HHI)) +
+  geom_histogram(aes(y = ..density..), binwidth = 10, fill = "green", color = "black", alpha = 0.5) +
+  geom_density(color = "red", adjust = .6, size = 1) +
+  theme_minimal() +
+  labs(title = "Distribución de la Huella Hídrica Indirecta (HHI)", x = "HHI", y = "Densidad") +
+  annotation_custom(grob = grob_HHI, xmin = max(datos$HHI, na.rm = TRUE) - diff(range(datos$HHI, na.rm = TRUE))/3, xmax = max(datos$HHI, na.rm = TRUE), ymin = max(density(datos$HHI, na.rm = TRUE)$y), ymax = Inf)
+
+# Dibujar las gráficas
+grid.arrange(p_HHD, p_HHI, nrow = 2)
+```
+
+Por otro lado, la gráfica de la Huella Hídrica Indirecta (HHI) muestra claramente dos picos, lo que indica una distribución bimodal. Esto sugiere que hay dos patrones principales distintos de consumo de agua indirecto entre los estudiantes. El boxplot superior derecho con respecto a comp_HHI tiene el orden `café`, `carne`, `fruta` respectivamente. La carne, en particular, tiene una mediana considerablemente más alta y un rango más extenso (similar a la del café, pero con menos variación), lo que refleja un consumo de agua indirecto significativamente mayor asociado con este componente. Esto puede deberse al hecho de que la producción de carne generalmente requiere más recursos hídricos que otros alimentos. Los estudiantes que consumen más carne, por lo tanto, contribuyen a una huella hídrica indirecta más elevada..
+
