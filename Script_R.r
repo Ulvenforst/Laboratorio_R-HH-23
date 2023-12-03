@@ -113,3 +113,48 @@ summary(Valid_Data)
 # Guardar datos limpios
 # ruta <- "Data/clean_huella.txt"
 # write.table(datos, file = ruta, sep = "\t", row.names = FALSE, na = "")
+
+# Carga de datos limpios
+datos <- read.csv("Data/clean_huella.txt", header = TRUE, sep = "\t")
+
+# Distribuciones
+# Asegurándonos de que los nombres de los ejes y las etiquetas estén presentes y claros
+bp_theme <- theme(
+  axis.title.x = element_text(face = "bold", color = "black", size = 12),
+  axis.text.x = element_text(angle = 45, hjust = 1, color = "black", size = 10),
+  axis.title.y = element_text(face = "bold", color = "black", size = 12),
+  axis.text.y = element_text(color = "black", size = 10),
+  plot.title = element_text(hjust = 0.5, face = "bold", size = 14)
+)
+
+# Crear los gráficos de boxplot con etiquetas adecuadas
+bp_HHD <- ggplot(datos, aes(x = comp_HHD, y = HHD)) + 
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Boxplot de HHD por Componente", x = "Componente de HHD", y = "HHD") +
+  bp_theme
+
+bp_HHI <- ggplot(datos, aes(x = comp_HHI, y = HHI)) + 
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Boxplot de HHI por Componente", x = "Componente de HHI", y = "HHI") +
+  bp_theme
+
+# Crear los gráficos de distribución
+p_HHD <- ggplot(datos, aes(x = HHD)) +
+  geom_histogram(aes(y = ..density..), binwidth = 10, fill = "blue", color = "black", alpha = 0.5) +
+  geom_density(color = "red", size = 1) +
+  theme_minimal() +
+  labs(title = "Distribución de HHD", x = "HHD", y = "Densidad") +
+  bp_theme
+
+p_HHI <- ggplot(datos, aes(x = HHI)) +
+  geom_histogram(aes(y = ..density..), binwidth = 100, fill = "green", color = "black", alpha = 0.5) +
+  geom_density(color = "red", size = 1) +
+  theme_minimal() +
+  labs(title = "Distribución de HHI", x = "HHI", y = "Densidad") +
+  bp_theme
+
+# Organizar las gráficas en un solo panel con x11
+x11()
+grid.arrange(p_HHD, bp_HHD, p_HHI, bp_HHI, ncol = 2, nrow = 2)

@@ -174,16 +174,22 @@ for (var in variables_interes) {
 
 Podemos observar que la edad cumple con nuestras reglas establecidas, y no hay datos atípicos. Para `HHD`, `HHI` y `per.hogar` podemos intuir comportamientos respectivos a datos atípicos. Dado que todos nuestros datos son positivos podemos calcular solo los cercos superiores (estos pueden visualizarse en los boxplot) y hacer un conteo de estos datos atípicos, permitiéndonos una mejor comprensión de los mismos:
 
-```{r echo=FALSE, message=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 # Función para calcular el cerco superior y contar datos atípicos, y luego imprimir el resultado
+
+
 calcular_cerco_superior_y_conteo <- function(data, variable) {
     Q3 <- quantile(data[[variable]], 0.75, na.rm = TRUE)
     IQR <- IQR(data[[variable]], na.rm = TRUE)
     upper_bound <- Q3 + 1.5 * IQR
     conteo_atipicos <- sum(data[[variable]] > upper_bound, na.rm = TRUE)
 
-    mensaje <- paste("Cerco superior de", variable, ":", upper_bound, "; Número de datos atípicos:", conteo_atipicos)
-    print(mensaje)
+    max_value <- max(data[[variable]], na.rm = TRUE)
+    
+    mensaje <- paste("Cerco superior de", variable, ":", upper_bound, 
+                     "; Número de datos atípicos:", conteo_atipicos, 
+                     "; Valor máximo:", max_value)
+    return(mensaje)
 }
 
 # Aplicar la función a las variables de interés
@@ -232,8 +238,10 @@ par(mfrow=c(1, 2), mar=c(4, 4, 2, 1))
 for (var in variables_interes) {
   # Histograma
   hist(datos[[var]], main=paste("Histograma de", var), xlab=var, col="lightblue")
-
 }
+
+print(paste("Valor máximo de HHD:", max(datos$HHD, na.rm = TRUE)))
+print(paste("Valor máximo de per.hogar:", max(datos$per.hog, na.rm = TRUE)))
 ```
 
 Hemos decidido remplazar los datos faltantes de `HHD` y `HHI` con una regresión lineal debido a que la naturaleza de estos valores suele variar entre números muy grandes, y su varianza suele ser mayor. Lo contrario sucede con `per.hogar` la cual puede ser remplazada simplemente por la media.
@@ -260,7 +268,6 @@ datos$per.hog <- round(datos$per.hog)
 
 # Visualización de datos faltantes
 visdat::vis_miss(datos)
-
 ```
 
 Podemos observar entonces que ya no tenemos datos faltantes, y si ahora volvemos a validar las reglas tendremos
@@ -278,7 +285,6 @@ head(datos)
 
 # ruta <- "../Data/clean_huella.txt"
 # write.table(datos, file = ruta, sep = "\t", row.names = FALSE, na = "")
-
 ```
 
 En esta muestra no se alcanzan a visualizar todos los cambios, esto por efectos prácticos y que el documento no quede tan largo, puede encontrar la base de datos limpia en `clean_huella.txt`
@@ -295,7 +301,6 @@ datos <- read.csv("../Data/clean_huella.txt", header = TRUE, sep = "\t")
 La gráfica que representa la Huella Hídrica Directa (HHD) muestra una distribución que parece inclinarse hacia un único pico principal, lo que sugiere que la mayoría de los estudiantes tiene un nivel de consumo de agua directo relativamente homogéneo. La presencia de un pico central y dominante puede indicar que la mayoría de los estudiantes comparten prácticas similares en cuanto al uso directo de agua. En la esquina superior derecha podemos observar un boxplot respectivo al comp_HHD en el oden `lavado_ropa`, `riego_jardin`, `uso_baño`, `uso_cocina` respectivamente. Notamos diferencias notables entre los componentes del uso del agua, como el lavado de ropa, riego de jardín, uso de baño y uso de cocina. El uso de cocina y el uso del baño parecen tener una mediana más alta y una variabilidad mayor en el consumo de agua, indicada por el rango intercuartílico más amplio y los valores atípicos (para las nuevas medidas) presentes.
 
 ```{R echo=FALSE, warning=FALSE}
-# Primero, generamos los boxplots como grobs
 bp_HHD <- ggplot(datos, aes(x = factor(comp_HHD), y = HHD)) + 
   geom_boxplot() +
   theme_minimal() +
@@ -316,7 +321,6 @@ bp_HHI <- ggplot(datos, aes(x = factor(comp_HHI), y = HHI)) +
     axis.ticks.x=element_blank()
   )
 
-# Convertimos los ggplots a grobs
 grob_HHD <- ggplotGrob(bp_HHD)
 grob_HHI <- ggplotGrob(bp_HHI)
 
