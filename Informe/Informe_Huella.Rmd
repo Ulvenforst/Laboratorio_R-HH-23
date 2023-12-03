@@ -286,12 +286,33 @@ En esta muestra no se alcanzan a visualizar todos los cambios, esto por efectos 
 
 Cabe mencionar que Excel puede tener problemas para la decodificación de archivos UTF-8 en csv, mostrando caracteres hispanos como símbolos faltantes, aun así hemos decidido mantener estos caracteres hispanos por fidelidad a la lengua española. R interpreta bien la decodificación de estos por medio del `fileEncoding="UTF-8"`, y si se quiere ver el archivo con toda su integridad se puede abrir `clean_huella.csv` desde un editor de código, o especificar en Excel la decodificación `65001: Unicode (UTF-8)` al importar la hoja, esta no se debe guardar ya que puede afectar la tabla original. Mencionamos todo esto para evitar problemas, y al mismo tiempo dejamos `clean_huella.txt` como alternativa.
 
-## 2 Visualización de los datos
-
 ```{r echo=FALSE, message=FALSE}
 # Cargar los datos limpios
 datos <- read.csv(ruta, header = TRUE)
 ```
+
+### 1.8 Creación de varible de Huella Hídrica Total
+
+Procedemos a crear la variable correspondiente a la huella hídrica total `HHT` siendo la suma de la huella hídrica directa e indirecta, y una variable de clasificación `HHT_clas` con base siguientes condiciones:
+
+| Grupo | Rango de clasificación |
+|-------|------------------------|
+| Bajo  | si HHT ≤ 1789          |
+| Medio | si 1789 < HHT ≤ 1887   |
+| Alto  | si HHT > 1887          |
+
+```{R echo=FALSE}
+
+# 1.8 Creacion de las nuevas variables HHT Y HHT_clas
+datos$HHT <- datos$HHD + datos$HHI
+datos$HHT_clas <- cut(datos$HHT,
+                      breaks = c(-Inf, 1789, 1887, Inf),
+                      labels = c("bajo", "medio", "alto"),
+                      include.lowest = TRUE)
+
+```
+
+## 2 Visualización de los datos
 
 ### 2.1 Gráficas de distribuciones de Huella Hídrica
 
@@ -341,6 +362,35 @@ grid.arrange(p_HHD, p_HHI, nrow = 2)
 ```
 
 Por otro lado, la gráfica de la Huella Hídrica Indirecta (HHI) muestra claramente dos picos, lo que indica una distribución bimodal. Esto sugiere que hay dos patrones principales distintos de consumo de agua indirecto entre los estudiantes. El boxplot superior derecho con respecto a comp_HHI tiene el orden `café`, `carne`, `fruta` respectivamente. La carne, en particular, tiene una mediana considerablemente más alta y un rango más extenso (similar a la del café, pero con menos variación), lo que refleja un consumo de agua indirecto significativamente mayor asociado con este componente. Esto puede deberse al hecho de que la producción de carne generalmente requiere más recursos hídricos que otros alimentos. Los estudiantes que consumen más carne, por lo tanto, contribuyen a una huella hídrica indirecta más elevada.
+
+```{R echo=FALSE}
+bp_HHT <- ggplot(datos, aes(x = factor(HHT_clas), y = HHT)) + 
+  geom_boxplot() +
+  theme_minimal() +
+  labs(x = "", y = "HHT") +
+  theme(
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  )
+
+grob_HHT <- ggplotGrob(bp_HHT)
+
+p_HHT <- ggplot(datos, aes(x = HHT)) +
+  geom_histogram(aes(y = ..density..), binwidth = 20, fill = "orange", color = "black", alpha = 0.5) +
+  geom_density(color = "red", adjust = 1, size = 1) +
+  theme_minimal() +
+  labs(title = "Distribución de la Huella Hídrica Total (HHT)", x = "HHT", y = "Densidad") +
+  annotation_custom(grob = grob_HHT, xmin = max(datos$HHT, na.rm = TRUE) - diff(range(datos$HHT, na.rm = TRUE))/3, xmax = max(datos$HHT, na.rm = TRUE), ymin = max(density(datos$HHT, na.rm = TRUE)$y), ymax = Inf)
+
+grid.arrange(p_HHT, nrow = 1)
+```
+
+La distribución de la Huella Hídrica Total (HHT) parece tener un rango amplio de valores con varias concentraciones a lo largo del espectro. La presencia de múltiples picos en el histograma sugiere que hay diferentes grupos de estudiantes con distintos niveles de consumo total de agua. Esto puede reflejar la diversidad en las prácticas de consumo y producción que afectan tanto la huella hídrica directa como la indirecta de los estudiantes.
+
+El boxplot superior a la derecha para HHT es con respecto a los grupos `Bajo`, `Medio` y `Alto`, muestra una clara distinción entre los tres grupos. Los estudiantes clasificados en el grupo `Bajo` tienen una mediana inferior a los de los grupos `Medio` y `Alto`, lo que indica que sus prácticas generales de consumo de agua son menos intensivas. El grupo `Medio` presenta una variabilidad relativamente menor comparado con el grupo `Alto`, lo que podría sugerir que los estudiantes en esta categoría tienen hábitos de consumo de agua más consistentes entre ellos.
+
+El grupo `Alto` muestra no solo una mediana más elevada, sino también la presencia de valores atípicos. Esto indica que hay una variación significativa en el consumo de agua dentro de este grupo, con algunos estudiantes que tienen un consumo de agua particularmente alto. Estos valores atípicos pueden deberse a prácticas específicas o a circunstancias individuales que resultan en un consumo mucho mayor que el promedio de sus pares.
 
 ### 2.2 Comportamiento de HHD y HHI con cada factor
 

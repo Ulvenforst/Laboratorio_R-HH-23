@@ -168,6 +168,7 @@ datos$HHT_clas <- cut(datos$HHT,
                       include.lowest = TRUE)
 
 # 2.1 Distribuciones
+
 # Asegurándonos de que los nombres de los ejes y las etiquetas estén presentes y claros
 x11()
 grid.arrange(p_HHD, bp_HHD, p_HHI, bp_HHI, p_HHT, bp_HHT, ncol = 2, nrow = 3)
