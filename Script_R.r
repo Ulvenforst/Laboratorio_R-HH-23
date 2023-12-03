@@ -24,6 +24,7 @@
 # install.packages("ggplot2") # Se recomienda última versión.
 # install.packages("gridExtra") # Se recomienda última versión.
 # install.packages("grid") # Se recomienda última versión.
+install.packages("knitr") # Se recomienda última versión.
 
 library(data.table)
 library(gridExtra)
@@ -33,6 +34,7 @@ library(dplyr)
 library(editrules)
 library(tidyr)
 library(ggplot2)
+library(knitr)
 
 # 1.1 Carga de datos
 datos <- read.csv("Data/BD_Huella.txt", header = TRUE, sep = "\t")
@@ -158,7 +160,7 @@ ruta <- "Data/clean_huella.csv"
 # Carga de datos limpios
 datos <- read.csv(ruta, header = TRUE)
 
-# Creacion de las nuevas variables HHT Y HHT_clas
+# 1.8 Creacion de las nuevas variables HHT Y HHT_clas
 datos$HHT <- datos$HHD + datos$HHI
 datos$HHT_clas <- cut(datos$HHT,
                       breaks = c(-Inf, 1789, 1887, Inf),
@@ -167,6 +169,8 @@ datos$HHT_clas <- cut(datos$HHT,
 
 # 2.1 Distribuciones
 # Asegurándonos de que los nombres de los ejes y las etiquetas estén presentes y claros
+x11()
+grid.arrange(p_HHD, bp_HHD, p_HHI, bp_HHI, p_HHT, bp_HHT, ncol = 2, nrow = 3)
 bp_theme <- theme(
   axis.title.x = element_text(face = "bold", color = "black", size = 12),
   axis.text.x = element_text(angle = 45, hjust = 1, color = "black", size = 10),
@@ -219,4 +223,127 @@ p_HHT <- ggplot(datos, aes(x = HHT)) +
 
 # Organizar las gráficas en un solo panel con x11
 x11()
-grid.arrange(p_HHD, bp_HHD, p_HHI, bp_HHI, p_HHT, bp_HHT, ncol = 3, nrow = 2)
+
+# 2.2 Comportamiento de HHD y HHI con cada factor
+common_theme <- theme_minimal() +
+  theme(
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(size = 10, angle = 45, vjust = 0.5), # Etiquetas del eje X inclinadas
+    axis.text.y = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14),
+    legend.position = "none" # Desactivar la leyenda globalmente
+  )
+
+# Función para crear gráficos de HHD y HHI por factor con colores suaves
+crear_graficos_por_factor <- function(data, factor) {
+  pa_HHD <- ggplot(data, aes_string(x = factor, y = "HHD", fill = factor)) +
+    geom_boxplot() +
+    labs(title = paste("HHD por", factor), y = "HHD") +
+    scale_fill_brewer(palette = "Set2") +
+    common_theme
+  
+  pa_HHI <- ggplot(data, aes_string(x = factor, y = "HHI", fill = factor)) +
+    geom_boxplot() +
+    labs(title = paste("HHI por", factor), y = "HHI") +
+    scale_fill_brewer(palette = "Set3") +
+    common_theme
+  
+  return(list(pa_HHD, pa_HHI))
+}
+
+# Crear los gráficos para cada factor
+graficos_genero <- crear_graficos_por_factor(datos, "genero")
+graficos_grado <- crear_graficos_por_factor(datos, "grado")
+graficos_zona <- crear_graficos_por_factor(datos, "zona")
+
+# Combinar los gráficos en una sola ventana
+grid.arrange(
+  graficos_genero[[1]], graficos_genero[[2]],
+  graficos_grado[[1]], graficos_grado[[2]],
+  graficos_zona[[1]], graficos_zona[[2]],
+  ncol = 2, nrow = 3
+)
+
+# 2.3 Resumen general de indicadores descriptivos para HHD y HHI
+# Función para calcular la moda
+moda <- function(x) {
+  uniqx <- unique(x)
+  uniqx[which.max(tabulate(match(x, uniqx)))]
+}
+
+resumen_general <- datos %>%
+  summarise(
+    count_HHD = n(),
+    mean_HHD = mean(HHD, na.rm = TRUE),
+    median_HHD = median(HHD, na.rm = TRUE),
+    sd_HHD = sd(HHD, na.rm = TRUE),
+    min_HHD = min(HHD, na.rm = TRUE),
+    max_HHD = max(HHD, na.rm = TRUE),
+    mode_HHD = moda(HHD),
+    count_HHI = n(),
+    mean_HHI = mean(HHI, na.rm = TRUE),
+    median_HHI = median(HHI, na.rm = TRUE),
+    sd_HHI = sd(HHI, na.rm = TRUE),
+    min_HHI = min(HHI, na.rm = TRUE),
+    max_HHI = max(HHI, na.rm = TRUE),
+    mode_HHI = moda(HHI)
+  )
+
+resumen_genero <- datos %>%
+  group_by(genero) %>%
+  summarise(
+    count = n(),
+    mean_HHD = mean(HHD, na.rm = TRUE),
+    median_HHD = median(HHD, na.rm = TRUE),
+    sd_HHD = sd(HHD, na.rm = TRUE),
+    min_HHD = min(HHD, na.rm = TRUE),
+    max_HHD = max(HHD, na.rm = TRUE),
+    mode_HHD = moda(HHD),
+    mean_HHI = mean(HHI, na.rm = TRUE),
+    median_HHI = median(HHI, na.rm = TRUE),
+    sd_HHI = sd(HHI, na.rm = TRUE),
+    min_HHI = min(HHI, na.rm = TRUE),
+    max_HHI = max(HHI, na.rm = TRUE),
+    mode_HHI = moda(HHI)
+  )
+
+resumen_grado <- datos %>%
+  group_by(grado) %>%
+  summarise(
+    count = n(),
+    mean_HHD = mean(HHD, na.rm = TRUE),
+    median_HHD = median(HHD, na.rm = TRUE),
+    sd_HHD = sd(HHD, na.rm = TRUE),
+    min_HHD = min(HHD, na.rm = TRUE),
+    max_HHD = max(HHD, na.rm = TRUE),
+    mode_HHD = moda(HHD),
+    mean_HHI = mean(HHI, na.rm = TRUE),
+    median_HHI = median(HHI, na.rm = TRUE),
+    sd_HHI = sd(HHI, na.rm = TRUE),
+    min_HHI = min(HHI, na.rm = TRUE),
+    max_HHI = max(HHI, na.rm = TRUE),
+    mode_HHI = moda(HHI)
+  )
+
+resumen_zona <- datos %>%
+  group_by(zona) %>%
+  summarise(
+    count = n(),
+    mean_HHD = mean(HHD, na.rm = TRUE),
+    median_HHD = median(HHD, na.rm = TRUE),
+    sd_HHD = sd(HHD, na.rm = TRUE),
+    min_HHD = min(HHD, na.rm = TRUE),
+    max_HHD = max(HHD, na.rm = TRUE),
+    mode_HHD = moda(HHD),
+    mean_HHI = mean(HHI, na.rm = TRUE),
+    median_HHI = median(HHI, na.rm = TRUE),
+    sd_HHI = sd(HHI, na.rm = TRUE),
+    min_HHI = min(HHI, na.rm = TRUE),
+    max_HHI = max(HHI, na.rm = TRUE),
+    mode_HHI = moda(HHI)
+  )
+
+print(resumen_general)
+print(resumen_genero)
+print(resumen_grado)
+print(resumen_zona)

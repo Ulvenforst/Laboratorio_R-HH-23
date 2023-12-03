@@ -32,6 +32,7 @@ library(ggplot2)
 library(visdat)
 library(gridExtra)
 library(grid)
+library(knitr)
 
 # Cargar los datos (ajusta la ruta del archivo según sea necesario)
 datos <- read.csv("../Data/BD_huella.txt", header = TRUE, sep = "\t")
@@ -278,7 +279,7 @@ head(datos)
 
 # 1.7 Base de datos limpia
 ruta <- "../Data/clean_huella.csv"
-write.csv(datos, file = ruta, row.names = FALSE, na = "", fileEncoding = "UTF-8")
+# write.csv(datos, file = ruta, row.names = FALSE, na = "", fileEncoding = "UTF-8")
 ```
 
 En esta muestra no se alcanzan a visualizar todos los cambios, esto por efectos prácticos y que el documento no quede tan largo, puede encontrar la base de datos limpia en `clean_huella.csv`.
@@ -297,6 +298,7 @@ datos <- read.csv(ruta, header = TRUE)
 La gráfica que representa la Huella Hídrica Directa (HHD) muestra una distribución que parece inclinarse hacia un único pico principal, lo que sugiere que la mayoría de los estudiantes tiene un nivel de consumo de agua directo relativamente homogéneo. La presencia de un pico central y dominante puede indicar que la mayoría de los estudiantes comparten prácticas similares en cuanto al uso directo de agua. En la esquina superior derecha podemos observar un boxplot respectivo al comp_HHD en el oden `lavado_ropa`, `riego_jardin`, `uso_baño`, `uso_cocina` respectivamente. Notamos diferencias notables entre los componentes del uso del agua, como el lavado de ropa, riego de jardín, uso de baño y uso de cocina. El uso de cocina y el uso del baño parecen tener una mediana más alta y una variabilidad mayor en el consumo de agua, indicada por el rango intercuartílico más amplio y los valores atípicos (para las nuevas medidas) presentes.
 
 ```{R echo=FALSE, warning=FALSE}
+
 bp_HHD <- ggplot(datos, aes(x = factor(comp_HHD), y = HHD)) + 
   geom_boxplot() +
   theme_minimal() +
@@ -338,5 +340,122 @@ p_HHI <- ggplot(datos, aes(x = HHI)) +
 grid.arrange(p_HHD, p_HHI, nrow = 2)
 ```
 
-Por otro lado, la gráfica de la Huella Hídrica Indirecta (HHI) muestra claramente dos picos, lo que indica una distribución bimodal. Esto sugiere que hay dos patrones principales distintos de consumo de agua indirecto entre los estudiantes. El boxplot superior derecho con respecto a comp_HHI tiene el orden `café`, `carne`, `fruta` respectivamente. La carne, en particular, tiene una mediana considerablemente más alta y un rango más extenso (similar a la del café, pero con menos variación), lo que refleja un consumo de agua indirecto significativamente mayor asociado con este componente. Esto puede deberse al hecho de que la producción de carne generalmente requiere más recursos hídricos que otros alimentos. Los estudiantes que consumen más carne, por lo tanto, contribuyen a una huella hídrica indirecta más elevada..
+Por otro lado, la gráfica de la Huella Hídrica Indirecta (HHI) muestra claramente dos picos, lo que indica una distribución bimodal. Esto sugiere que hay dos patrones principales distintos de consumo de agua indirecto entre los estudiantes. El boxplot superior derecho con respecto a comp_HHI tiene el orden `café`, `carne`, `fruta` respectivamente. La carne, en particular, tiene una mediana considerablemente más alta y un rango más extenso (similar a la del café, pero con menos variación), lo que refleja un consumo de agua indirecto significativamente mayor asociado con este componente. Esto puede deberse al hecho de que la producción de carne generalmente requiere más recursos hídricos que otros alimentos. Los estudiantes que consumen más carne, por lo tanto, contribuyen a una huella hídrica indirecta más elevada.
 
+### 2.2 Comportamiento de HHD y HHI con cada factor
+
+Podemos observar 
+
+```{R echo=FALSE, warning=FALSE, fig.width=14, fig.height=12}
+common_theme <- theme_minimal() +
+  theme(
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(size = 10, angle = 45, vjust = 0.5), # Etiquetas del eje X inclinadas
+    axis.text.y = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 14),
+    legend.position = "none" # Desactivar la leyenda globalmente
+  )
+
+# Función para crear gráficos de HHD y HHI por factor con colores suaves
+crear_graficos_por_factor <- function(data, factor) {
+  pa_HHD <- ggplot(data, aes_string(x = factor, y = "HHD", fill = factor)) +
+    geom_boxplot() +
+    labs(title = paste("HHD por", factor), y = "HHD") +
+    scale_fill_brewer(palette = "Set2") +
+    common_theme
+  
+  pa_HHI <- ggplot(data, aes_string(x = factor, y = "HHI", fill = factor)) +
+    geom_boxplot() +
+    labs(title = paste("HHI por", factor), y = "HHI") +
+    scale_fill_brewer(palette = "Set3") +
+    common_theme
+  
+  return(list(pa_HHD, pa_HHI))
+}
+
+# Crear los gráficos para cada factor
+graficos_genero <- crear_graficos_por_factor(datos, "genero")
+graficos_grado <- crear_graficos_por_factor(datos, "grado")
+graficos_zona <- crear_graficos_por_factor(datos, "zona")
+
+# Combinar los gráficos en una sola ventana
+grid.arrange(
+  graficos_genero[[1]], graficos_genero[[2]],
+  graficos_grado[[1]], graficos_grado[[2]],
+  graficos_zona[[1]], graficos_zona[[2]],
+  ncol = 2, nrow = 3
+)
+
+```
+
+### 2.3 Resumen de principales indicadores descriptivos por factor
+Podemos observar 
+
+```{R echo=FALSE, warning=FALSE}
+# 2.3 Resumen general de indicadores descriptivos para HHD y HHI
+# Función para calcular la moda
+moda <- function(x) {
+  uniqx <- unique(x)
+  uniqx[which.max(tabulate(match(x, uniqx)))]
+}
+
+# Función para crear resúmenes separados para HHD y HHI
+crear_resumen <- function(data, variable, name) {
+  resumen <- data %>%
+    summarise(
+      count = n(),
+      mean = mean(!!sym(variable), na.rm = TRUE),
+      median = median(!!sym(variable), na.rm = TRUE),
+      sd = sd(!!sym(variable), na.rm = TRUE),
+      min = min(!!sym(variable), na.rm = TRUE),
+      max = max(!!sym(variable), na.rm = TRUE),
+      mode = moda(!!sym(variable))
+    )
+  
+  # Cambiar nombres de columnas para reflejar la variable
+  colnames(resumen) <- paste(colnames(resumen), name, sep = "_")
+  return(resumen)
+}
+
+# Crear resúmenes separados
+resumen_general_HHD <- crear_resumen(datos, "HHD", "HHD")
+resumen_general_HHI <- crear_resumen(datos, "HHI", "HHI")
+
+resumen_genero_HHD <- crear_resumen(datos %>% group_by(genero), "HHD", "HHD")
+resumen_genero_HHI <- crear_resumen(datos %>% group_by(genero), "HHI", "HHI")
+
+resumen_grado_HHD <- crear_resumen(datos %>% group_by(grado), "HHD", "HHD")
+resumen_grado_HHI <- crear_resumen(datos %>% group_by(grado), "HHI", "HHI")
+
+resumen_zona_HHD <- crear_resumen(datos %>% group_by(zona), "HHD", "HHD")
+resumen_zona_HHI <- crear_resumen(datos %>% group_by(zona), "HHI", "HHI")
+
+```
+
+Podemos observar 
+
+```{R echo=FALSE}
+kable(resumen_general_HHD, caption = "Resumen General de HHD", align = 'c')
+kable(resumen_general_HHI, caption = "Resumen General de HHI", align = 'c')
+```
+
+Podemos observar 
+
+```{R echo=FALSE}
+kable(resumen_genero_HHD, caption = "Resumen de HHD por Género", align = 'c')
+kable(resumen_genero_HHI, caption = "Resumen de HHI por Género", align = 'c')
+```
+
+Podemos observar 
+
+```{R echo=FALSE}
+kable(resumen_grado_HHD, caption = "Resumen de HHD por Grado Escolar", align = 'c')
+kable(resumen_grado_HHI, caption = "Resumen de HHI por Grado Escolar", align = 'c')
+```
+
+Podemos observar 
+
+```{R echo=FALSE}
+kable(resumen_zona_HHD, caption = "Resumen de HHD por Zona", align = 'c')
+kable(resumen_zona_HHI, caption = "Resumen de HHI por Zona", align = 'c')
+```
