@@ -25,6 +25,7 @@
 # install.packages("gridExtra") # Se recomienda última versión.
 # install.packages("grid") # Se recomienda última versión.
 
+library(data.table)
 library(gridExtra)
 library(grid)
 library(visdat)
@@ -153,9 +154,8 @@ Valid_Data <- editrules::violatedEdits(rules, datos)
 summary(Valid_Data)
 
 # 1.7 Guardar datos limpios
-# ruta <- "Data/clean_huella.csv"
-# write.csv(datos, file = ruta, row.names = FALSE, na = "")
-
+ruta <- "Data/clean_huella.csv"
+# write.csv(datos, file = ruta, row.names = FALSE, na = "", fileEncoding = "UTF-8")
 
 # Carga de datos limpios
 datos <- read.csv(ruta, header = TRUE)

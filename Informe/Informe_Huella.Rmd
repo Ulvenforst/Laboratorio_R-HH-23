@@ -282,10 +282,12 @@ head(datos)
 
 # 1.7 Base de datos limpia
 ruta <- "../Data/clean_huella.csv"
-# write.csv(datos, file = ruta, row.names = FALSE, na = "")
+# write.csv(datos, file = ruta, row.names = FALSE, na = "", fileEncoding = "UTF-8")
 ```
 
-En esta muestra no se alcanzan a visualizar todos los cambios, esto por efectos prácticos y que el documento no quede tan largo, puede encontrar la base de datos limpia en `clean_huella.txt`
+En esta muestra no se alcanzan a visualizar todos los cambios, esto por efectos prácticos y que el documento no quede tan largo, puede encontrar la base de datos limpia en `clean_huella.csv`.
+
+Cabe mencionar que Excel puede tener problemas para la decodificación de archivos UTF-8 en csv, mostrando caracteres hispanos como símbolos faltantes, aun así hemos decidido mantener estos caracteres hispanos por fidelidad a la lengua española. R interpreta bien la decodificación de estos por medio del `fileEncoding="UTF-8"`, y si se quiere ver el archivo con toda su integridad se puede abrir `clean_huella.csv` desde un editor de código, o especificar en Excel la decodificación `65001: Unicode (UTF-8)` al importar la hoja, esta no se debe guardar ya que puede afectar la tabla original. Mencionamos todo esto para evitar problemas, y al mismo tiempo dejamos `clean_huella.txt` como alternativa.
 
 ## 2 Visualización de los datos
 
