@@ -168,16 +168,13 @@ for (var in variables_interes) {
   hist(datos[[var]], main=paste("Histograma de", var), xlab=var, col="lightblue")
 
   # Boxplot
-  boxplot(datos[[var]], horizontal=TRUE, main=paste("Boxplot de", var), xlab=var, col="lightgreen")
+  boxplot(datos[[var]], main=paste("Boxplot de", var), xlab=var, col="lightgreen", horizontal=TRUE)
 }
 ```
 
 Podemos observar que la edad cumple con nuestras reglas establecidas, y no hay datos atípicos. Para `HHD`, `HHI` y `per.hogar` podemos intuir comportamientos respectivos a datos atípicos. Dado que todos nuestros datos son positivos podemos calcular solo los cercos superiores (estos pueden visualizarse en los boxplot) y hacer un conteo de estos datos atípicos, permitiéndonos una mejor comprensión de los mismos:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-# Función para calcular el cerco superior y contar datos atípicos, y luego imprimir el resultado
-
-
 calcular_cerco_superior_y_conteo <- function(data, variable) {
     Q3 <- quantile(data[[variable]], 0.75, na.rm = TRUE)
     IQR <- IQR(data[[variable]], na.rm = TRUE)

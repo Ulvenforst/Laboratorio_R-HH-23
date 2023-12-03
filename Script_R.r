@@ -27,15 +27,16 @@
 
 library(gridExtra)
 library(grid)
+library(visdat)
 library(dplyr)
 library(editrules)
 library(tidyr)
 library(ggplot2)
 
-# Carga de datos
+# 1.1 Carga de datos
 datos <- read.csv("Data/BD_Huella.txt", header = TRUE, sep = "\t")
 
-# Limpieza de datos y calificación de variables cualitativas
+# 1.3 Limpieza de datos y calificación de variables cualitativas
 datos <- datos %>%
   mutate(
     genero = iconv(as.character(genero), to = "ASCII//TRANSLIT"),
@@ -64,6 +65,47 @@ datos <- datos %>%
     comp_HHI = tolower(comp_HHI)
   )
 
+# 1.4 Visualización de datos faltantes
+x11()
+print(vis_miss(datos))
+
+# 1.5 Estudio de datos atípicos
+x11()
+variables_interes <- c("edad", "HHD", "HHI", "per.hog")
+
+# Ajustar los márgenes y el número de gráficos por ventana gráfica
+par(mfrow=c(4, 2), mar=c(4, 4, 2, 1))
+
+# Visualización de datos atípicos para cada variable cuantitativa
+for (var in variables_interes) {
+  # Histograma
+  hist(datos[[var]], main=paste("Histograma de", var), xlab=var, col="lightblue")
+
+  # Boxplot
+  boxplot(datos[[var]], main=paste("Boxplot de", var), xlab=var, col="lightgreen", horizontal=TRUE)
+}
+
+
+calcular_cerco_superior_y_conteo <- function(data, variable) {
+    Q3 <- quantile(data[[variable]], 0.75, na.rm = TRUE)
+    IQR <- IQR(data[[variable]], na.rm = TRUE)
+    upper_bound <- Q3 + 1.5 * IQR
+    conteo_atipicos <- sum(data[[variable]] > upper_bound, na.rm = TRUE)
+
+    max_value <- max(data[[variable]], na.rm = TRUE)
+    
+    mensaje <- paste("Cerco superior de", variable, ":", upper_bound, 
+                     "; Número de datos atípicos:", conteo_atipicos, 
+                     "; Valor máximo:", max_value)
+    return(mensaje)
+}
+
+# Aplicar la función a las variables de interés
+calcular_cerco_superior_y_conteo(datos, "HHD")
+calcular_cerco_superior_y_conteo(datos, "HHI")
+calcular_cerco_superior_y_conteo(datos, "per.hog")
+
+# 1.6 Limpieza de datos atípicos y faltantes.
 # Función para reemplazar datos atípicos con NA
 reemplazar_atipicos_con_NA <- function(data, variable) {
     Q3 <- quantile(data[[variable]], 0.75, na.rm = TRUE)
@@ -105,19 +147,19 @@ datos <- datos %>%
 datos$per.hog <- ifelse(is.na(datos$per.hog) | datos$per.hog <= 0, mean_per_hog, datos$per.hog)
 datos$per.hog <- round(datos$per.hog)
 
-# Reglas de validación
+# 1.2 Reglas de validación
 rules <- editrules::editfile("Informe/consistencia.txt")
 Valid_Data <- editrules::violatedEdits(rules, datos)
 summary(Valid_Data)
 
-# Guardar datos limpios
+# 1.7 Guardar datos limpios
 # ruta <- "Data/clean_huella.txt"
 # write.table(datos, file = ruta, sep = "\t", row.names = FALSE, na = "")
 
 # Carga de datos limpios
 datos <- read.csv("Data/clean_huella.txt", header = TRUE, sep = "\t")
 
-# Distribuciones
+# 2.1 Distribuciones
 # Asegurándonos de que los nombres de los ejes y las etiquetas estén presentes y claros
 bp_theme <- theme(
   axis.title.x = element_text(face = "bold", color = "black", size = 12),
