@@ -7,21 +7,39 @@ date: "Fecha creación: 21-11-23; Última modificación: 3-12-23"
 license: "GPL-3.0"
 output: 
   html_document: default
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
+
 ## Historia
-Se desea caracterizar la huella hídrica de una institución de educación secundaria, se dispone de la base de datos `data/BD_huella.txt`, la cual contiene información de los estudiantes como: edad, género, zona, grado escolar, cantidad de HH directa e indirecta en $m^3$/año (`HHD` y `HHI`), el mayor componente de la HH directa e indirecta (`comp_HHD` y `comp_HHI`), y el número de personas que habitan en el hogar (`per.hog`).
+
+Se desea caracterizar la huella hídrica de una institución de educación
+secundaria, se dispone de la base de datos `data/BD_huella.txt`, la cual
+contiene información de los estudiantes como: edad, género, zona, grado
+escolar, cantidad de HH directa e indirecta en $m^3$/año (`HHD` y
+`HHI`), el mayor componente de la HH directa e indirecta (`comp_HHD` y
+`comp_HHI`), y el número de personas que habitan en el hogar
+(`per.hog`).
 
 Las variables cualitativas deben seguir la siguiente codificación:
 
-| Atributo | Valor                                  |
-|----------|----------------------------------------|
-| genero   | 1=femenino; 2=masculino                |
-| zona     | 1=urbano; 2=rural                      |
+| Atributo | Valor                                                      |
+|----------|------------------------------------------------------------|
+| genero   | 1=femenino; 2=masculino                                    |
+| zona     | 1=urbano; 2=rural                                          |
 | grado    | 6=sexto; 7=séptimo; 8=octavo; 9=noveno; 10=décimo; 11=once |
 
 ## 1 Preprocesamiento y Limpieza de Datos
+
 ### 1.1 Verificación técnica de datos
-Al revisar `BD_huella.txt` podremos notar que los titulares de los encabezados son correspondientes a los datos de cada propiedad, guardando una relación entre ellos, así que de manera general contamos con una base de datos correcta. También podremos notar que hace falta un preprocesamiento debido a datos faltantes o formatos no establecidos para mantener una consistencia. 
+
+Al revisar `BD_huella.txt` podremos notar que los titulares de los
+encabezados son correspondientes a los datos de cada propiedad,
+guardando una relación entre ellos, así que de manera general contamos
+con una base de datos correcta. También podremos notar que hace falta un
+preprocesamiento debido a datos faltantes o formatos no establecidos
+para mantener una consistencia.
 
 ```{r echo=FALSE, message=FALSE}
 # Librerías que se usarán
@@ -41,68 +59,83 @@ head(datos)
 ```
 
 ### 1.2 Ecuaciones de consistencia
-Empezamos aplicando la codificación definida para las variables cualitativas, y factorizándolas para futuras aplicaciones; la codificación será etiquetada para una mejor lectura. Consiguiente se define un formato general para las propiedades, estableciendo así una consistencia entre estas, se deben considerar cambios sutiles como tildes o mayúsculas.
-Las reglas matemáticas que permitirán esta consistencia están dadas por:
 
-1. **Rango de Edad**: La edad de los estudiantes debe ser razonable para el nivel de educación secundaria: $\{\forall \texttt{edad} \in \Bbb{Z} \mid 10 \leqslant \texttt{edad} \leqslant 20\}$
+Empezamos aplicando la codificación definida para las variables
+cualitativas, y factorizándolas para futuras aplicaciones; la
+codificación será etiquetada para una mejor lectura. Consiguiente se
+define un formato general para las propiedades, estableciendo así una
+consistencia entre estas, se deben considerar cambios sutiles como
+tildes o mayúsculas. Las reglas matemáticas que permitirán esta
+consistencia están dadas por:
 
-2. **Consistencia de Género**: El género debe ser femenino (1) o masculino (2), tras la transformación realizada:
-  
-   $\{\forall \texttt{genero} \in \{\texttt{'1', '2'}\} 
-   \\\mid \texttt{genero_i} := \texttt{'1'} \Leftrightarrow (\texttt{genero_i == 'femenino'} \vee \texttt{'1'}) 
-   \\\oplus \texttt{genero_i} := \texttt{'2'} \Leftrightarrow (\texttt{genero_i == 'masculino'} \vee \texttt{'2'})\}$
+1.  **Rango de Edad**: La edad de los estudiantes debe ser razonable
+    para el nivel de educación secundaria:
+    $\{\forall \texttt{edad} \in \Bbb{Z} \mid 10 \leqslant \texttt{edad} \leqslant 20\}$
 
-3. **Consistencia de Zona**: La zona debe ser urbana (1) o rural (2), de acuerdo con la recodificación:
+2.  **Consistencia de Género**: El género debe ser femenino (1) o
+    masculino (2), tras la transformación realizada:
 
-   $\{\forall\texttt{zona} \in \{\texttt{'1', '2'}\} 
-   \\\mid \texttt{zona_i} := \texttt{'1'} \Leftrightarrow (\texttt{zona_i == 'urbano'} \vee \texttt{'1'})
-   \\⊕ \texttt{zona_i} := \texttt{'2'} \Leftrightarrow (\texttt{zona_i == 'rural'} ∨ \texttt{'2'})\}$
-  
-4. **Consistencia de Grado Escolar**: El grado escolar debe estar entre sexto (6) y once (11), según la recodificación.
+    $\{\forall \texttt{genero} \in \{\texttt{'1', '2'}\} \\\mid \texttt{genero_i} := \texttt{'1'} \Leftrightarrow (\texttt{genero_i == 'femenino'} \vee \texttt{'1'}) \\\oplus \texttt{genero_i} := \texttt{'2'} \Leftrightarrow (\texttt{genero_i == 'masculino'} \vee \texttt{'2'})\}$
 
-   $\{∀\texttt{grado} ∈ \{\texttt{'6', '7', '8', '9', '10', '11'}\} 
-   \\\mid \texttt{grado_i} := \texttt{'6'} \Leftrightarrow (\texttt{grado_i == 'sexto'} ∨ \texttt{'6'}) 
-   \\⊕ \texttt{grado_i} := \texttt{'7'} \Leftrightarrow (\texttt{grado_i == 'septimo'} ∨ \texttt{'7'})
-   \\⊕ \texttt{grado_i} := \texttt{'8'} \Leftrightarrow (\texttt{grado_i == 'octavo'}∨ \texttt{'8'})
-   \\⊕ \texttt{grado_i} := \texttt{'9'} \Leftrightarrow (\texttt{grado_i == 'noveno'}∨ \texttt{'9'})
-   \\⊕ \texttt{grado_i} := \texttt{'10'} \Leftrightarrow (\texttt{grado_i == 'decimo'} ∨ \texttt{'10'})
-   \\⊕ \texttt{grado_i} := \texttt{'11'} \Leftrightarrow (\texttt{grado_i == 'once'} ∨ \texttt{'11'})\}$
+3.  **Consistencia de Zona**: La zona debe ser urbana (1) o rural (2),
+    de acuerdo con la recodificación:
 
-5. **Consistencia en `comp_HHD` y `comp_HHI`**; no deben haber variaciones textuales de un mismo componente, por ende se usan
-minúsculas. Al tratarse de variables nominales no se hace uso de codificación y se respeta el formato establecido:
-$\{∀\texttt{comp_HHD} ∈ \{\texttt{'uso_baño','lavado_ropa','uso_cocina',...,
-}\\\texttt{'〈actividad〉〈separador〉〈lugar〉'\} | 〈separador〉 := '_'\}}\\
-   \{∀\texttt{comp_HHI} ∈ \{\texttt{'carne','fruta','cafe',...,〈componente〉}\}\}$
+    $\{\forall\texttt{zona} \in \{\texttt{'1', '2'}\} \\\mid \texttt{zona_i} := \texttt{'1'} \Leftrightarrow (\texttt{zona_i == 'urbano'} \vee \texttt{'1'}) \\⊕ \texttt{zona_i} := \texttt{'2'} \Leftrightarrow (\texttt{zona_i == 'rural'} ∨ \texttt{'2'})\}$
 
+4.  **Consistencia de Grado Escolar**: El grado escolar debe estar entre
+    sexto (6) y once (11), según la recodificación.
 
-6. **Validez de Huella Hídrica Directa e Indirecta (`HHD` y `HHI`)**: Estos valores deben ser positivos y lógicos.
-   $Dominio = \{\texttt{HHD, HHI} ∈ ℝ⁺ \mid \texttt{HHD} > 0 ∧ \texttt{HHI} > 0\}$
-   
-   Además, si `HHI`, `HHD` == `''` (o `NA`) se remplaza por una regresión lineal, esto es:
+    $\{∀\texttt{grado} ∈ \{\texttt{'6', '7', '8', '9', '10', '11'}\} \\\mid \texttt{grado_i} := \texttt{'6'} \Leftrightarrow (\texttt{grado_i == 'sexto'} ∨ \texttt{'6'}) \\⊕ \texttt{grado_i} := \texttt{'7'} \Leftrightarrow (\texttt{grado_i == 'septimo'} ∨ \texttt{'7'}) \\⊕ \texttt{grado_i} := \texttt{'8'} \Leftrightarrow (\texttt{grado_i == 'octavo'}∨ \texttt{'8'}) \\⊕ \texttt{grado_i} := \texttt{'9'} \Leftrightarrow (\texttt{grado_i == 'noveno'}∨ \texttt{'9'}) \\⊕ \texttt{grado_i} := \texttt{'10'} \Leftrightarrow (\texttt{grado_i == 'decimo'} ∨ \texttt{'10'}) \\⊕ \texttt{grado_i} := \texttt{'11'} \Leftrightarrow (\texttt{grado_i == 'once'} ∨ \texttt{'11'})\}$
 
-   $\texttt{HHD_i} ∉ Dominio ⇒ \texttt{HHD_i :=} f_{RL}(\texttt{HHD_i})\\
-   \texttt{HHI_i} ∉ Dominio ⇒ \texttt{HHI_i :=} f_{RL}(\texttt{HHI_i})$
+5.  **Consistencia en `comp_HHD` y `comp_HHI`**; no deben haber
+    variaciones textuales de un mismo componente, por ende se usan
+    minúsculas. Al tratarse de variables nominales no se hace uso de
+    codificación y se respeta el formato establecido:
+    $\{∀\texttt{comp_HHD} ∈ \{\texttt{'uso_baño','lavado_ropa','uso_cocina',..., }\\\texttt{'〈actividad〉〈separador〉〈lugar〉'\} | 〈separador〉 := '_'\}}\\ \{∀\texttt{comp_HHI} ∈ \{\texttt{'carne','fruta','cafe',...,〈componente〉}\}\}$
 
-   $f_{RL}(x)$ representa la función de regresión lineal aplicada para estimar los valores faltantes de `HHD` o `HHI`, esto es:
+6.  **Validez de Huella Hídrica Directa e Indirecta (`HHD` y `HHI`)**:
+    Estos valores deben ser positivos y lógicos.
+    $Dominio = \{\texttt{HHD, HHI} ∈ ℝ⁺ \mid \texttt{HHD} > 0 ∧ \texttt{HHI} > 0\}$
 
-   $f_{RL}(x) = a + (b_1 × x_1) + (b_2 × x_2) + ... + (b_n × x_n) + ε$
+    Además, si `HHI`, `HHD` == `''` (o `NA`) se remplaza por una
+    regresión lineal, esto es:
 
-   Donde $a es el término de intercepción, que representa el valor esperado de $f_{RL}$ cuando todas las $x_i$ son cero. $b_i$ son los coeficientes de regresión asociados con cada variable independiente, que representan el cambio esperado en $f_{RL}$ por una unidad de cambio en $x_i$, manteniendo las demás $x$ constantes. $ε$ es el término de error, que representa la variación en $f_{RL}$ no explicada por las variables independientes. Se asume que $ε$ tiene una distribución normal con media cero y varianza constante (homocedasticidad).
+    $\texttt{HHD_i} ∉ Dominio ⇒ \texttt{HHD_i :=} f_{RL}(\texttt{HHD_i})\\ \texttt{HHI_i} ∉ Dominio ⇒ \texttt{HHI_i :=} f_{RL}(\texttt{HHI_i})$
 
-7. **Consistencia en Número de Personas en el Hogar (`per.hog`)**: Debe ser un número positivo y lógico. 
+    $f_{RL}(x)$ representa la función de regresión lineal aplicada para
+    estimar los valores faltantes de `HHD` o `HHI`, esto es:
 
-   $Dominio = \{\texttt{per.hog} ∈ ℤ \mid \texttt{per.hog} > 0\}$
+    $f_{RL}(x) = a + (b_1 × x_1) + (b_2 × x_2) + ... + (b_n × x_n) + ε$
 
-   Por ende, en caso de `per.hog` == `''` (o `NA`) se remplaza por la media, esto es:
-   $\texttt{per.hog_i} ∉ Dominio ⇒ \texttt{per.hog_i :=} x̄(texttt{per.hog})$
-   Donde $x̄(\texttt{per.hog}) = (Σ\texttt{per.hog_i})/N$
+    Donde \$a es el término de intercepción, que representa el valor
+    esperado de $f_{RL}$ cuando todas las $x_i$ son cero. $b_i$ son los
+    coeficientes de regresión asociados con cada variable independiente,
+    que representan el cambio esperado en $f_{RL}$ por una unidad de
+    cambio en $x_i$, manteniendo las demás $x$ constantes. $ε$ es el
+    término de error, que representa la variación en $f_{RL}$ no
+    explicada por las variables independientes. Se asume que $ε$ tiene
+    una distribución normal con media cero y varianza constante
+    (homocedasticidad).
 
+7.  **Consistencia en Número de Personas en el Hogar (`per.hog`)**: Debe
+    ser un número positivo y lógico.
 
-Todas estas reglas son implementadas en `consistencia.txt`, adaptadas a la librería `editrules`, la cual se usa para verificar que los datos cumplan con las reglas establecidas.
+    $Dominio = \{\texttt{per.hog} ∈ ℤ \mid \texttt{per.hog} > 0\}$
+
+    Por ende, en caso de `per.hog` == `''` (o `NA`) se remplaza por la
+    media, esto es:
+    $\texttt{per.hog_i} ∉ Dominio ⇒ \texttt{per.hog_i :=} x̄(texttt{per.hog})$
+    Donde $x̄(\texttt{per.hog}) = (Σ\texttt{per.hog_i})/N$
+
+Todas estas reglas son implementadas en `consistencia.txt`, adaptadas a
+la librería `editrules`, la cual se usa para verificar que los datos
+cumplan con las reglas establecidas.
 
 ### 1.3 Aplicación de reglas de consistencia
 
-Si omitimos parte de la regla 6 y 7 de momento, las cuales corresponden a llenar datos faltantes y solo tenemos en cuenta el dominio establecido, al aplicar estas reglas tenemos:
+Si omitimos parte de la regla 6 y 7 de momento, las cuales corresponden
+a llenar datos faltantes y solo tenemos en cuenta el dominio
+establecido, al aplicar estas reglas tenemos:
 
 ```{r echo=FALSE}
 # Limpieza de datos y calificación de variables cualitativas
@@ -136,7 +169,13 @@ datos <- datos %>%
   head(datos)
 ```
 
-De momento se omite la muestra de la tabla completa debido a su tamaño, sin embargo con esta muestra podemos observar una mayor consistencia con respecto a la muestra anterior, en el `ID` 6 todavía se observa un dato faltante `NA`, pero podemos notar el correcto etiquetado de cada propiedad. Si queremos ver el resumen de los datos validos usando `editrules` tenemos:
+De momento se omite la muestra de la tabla completa debido a su tamaño,
+sin embargo con esta muestra podemos observar una mayor consistencia con
+respecto a la muestra anterior, en el `ID` 6 todavía se observa un dato
+faltante `NA`, pero podemos notar el correcto etiquetado de cada
+propiedad. Si queremos ver el resumen de los datos validos usando
+`editrules` tenemos:
+
 ```{r echo=FALSE}
 # Reglas de validación
 rules <- editrules::editfile("consistencia.txt")
@@ -145,7 +184,10 @@ summary(Valid_Data)
 ```
 
 ### 1.4 Estudio de datos faltantes
-En el punto 1.3 observamos que las reglas establecidas aún no se cumplen, esto puede deberse a los datos faltantes de `HHD`, `HHI` y `per.hogar`, que constituyen el 1.8% de la totalidad de nuestros datos:
+
+En el punto 1.3 observamos que las reglas establecidas aún no se
+cumplen, esto puede deberse a los datos faltantes de `HHD`, `HHI` y
+`per.hogar`, que constituyen el 1.8% de la totalidad de nuestros datos:
 
 ```{r datos-faltantes, echo=FALSE, message=FALSE, warning=FALSE}
 # Visualización de datos faltantes
@@ -154,7 +196,11 @@ visdat::vis_miss(datos)
 
 ### 1.5 Estudio de datos atípicos
 
-Es útil identificar los datos atípicos, de manera que al momento de remplazar los datos faltantes estos sean más confiables. Al visualizar las variables cuantitativas de manera genera podremos notar comportamientos relativos a datos atípicos y de esta manera se podrá estudiar dicha propiedad de manera más específica:
+Es útil identificar los datos atípicos, de manera que al momento de
+remplazar los datos faltantes estos sean más confiables. Al visualizar
+las variables cuantitativas de manera genera podremos notar
+comportamientos relativos a datos atípicos y de esta manera se podrá
+estudiar dicha propiedad de manera más específica:
 
 ```{r identificar-outliers, echo=FALSE, message=FALSE, warning=FALSE}
 # Identificar variables cuantitativas de interés
@@ -173,7 +219,12 @@ for (var in variables_interes) {
 }
 ```
 
-Podemos observar que la edad cumple con nuestras reglas establecidas, y no hay datos atípicos. Para `HHD`, `HHI` y `per.hogar` podemos intuir comportamientos respectivos a datos atípicos. Dado que todos nuestros datos son positivos podemos calcular solo los cercos superiores (estos pueden visualizarse en los boxplot) y hacer un conteo de estos datos atípicos, permitiéndonos una mejor comprensión de los mismos:
+Podemos observar que la edad cumple con nuestras reglas establecidas, y
+no hay datos atípicos. Para `HHD`, `HHI` y `per.hogar` podemos intuir
+comportamientos respectivos a datos atípicos. Dado que todos nuestros
+datos son positivos podemos calcular solo los cercos superiores (estos
+pueden visualizarse en los boxplot) y hacer un conteo de estos datos
+atípicos, permitiéndonos una mejor comprensión de los mismos:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 calcular_cerco_superior_y_conteo <- function(data, variable) {
@@ -197,7 +248,10 @@ calcular_cerco_superior_y_conteo(datos, "per.hog")
 ```
 
 ### 1.6 Corrección de datos
-Identificados los datos atípicos procederemos a eliminarlos dejándolos como faltantes, para consiguiente implementar las ecuación de relleno establecidas en el punto 1.2.
+
+Identificados los datos atípicos procederemos a eliminarlos dejándolos
+como faltantes, para consiguiente implementar las ecuación de relleno
+establecidas en el punto 1.2.
 
 ```{r echo=FALSE}
 # Función para reemplazar datos atípicos con NA
@@ -238,7 +292,11 @@ datos$HHD[is.na(datos$HHD)] <- mean_HHD
 datos$per.hog[is.na(datos$per.hog)] <- mean_per_hog
 ```
 
-Al volver a graficar `HHD` y `per.hogar` notaremos que ahora los datos se encuentran dentro del límite identificado por el cerco superior. En este punto los valores de los cercos pueden variar si se vuelven a cualcular debido a la eliminación de extremos, sin embargo podemos estar seguros de contar con datos menos variados:
+Al volver a graficar `HHD` y `per.hogar` notaremos que ahora los datos
+se encuentran dentro del límite identificado por el cerco superior. En
+este punto los valores de los cercos pueden variar si se vuelven a
+cualcular debido a la eliminación de extremos, sin embargo podemos estar
+seguros de contar con datos menos variados:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE}
 # Identificar variables cuantitativas de interés
@@ -257,14 +315,19 @@ print(paste("Valor máximo de HHD:", max(datos$HHD, na.rm = TRUE)))
 print(paste("Valor máximo de per.hogar:", max(datos$per.hog, na.rm = TRUE)))
 ```
 
-Hemos decidido remplazar los datos faltantes de `HHD` y `HHI` con una regresión lineal debido a que la naturaleza de estos valores suele variar entre números muy grandes, y su varianza suele ser mayor. Lo contrario sucede con `per.hogar` la cual puede ser remplazada simplemente por la media.
+Hemos decidido remplazar los datos faltantes de `HHD` y `HHI` con una
+regresión lineal debido a que la naturaleza de estos valores suele
+variar entre números muy grandes, y su varianza suele ser mayor. Lo
+contrario sucede con `per.hogar` la cual puede ser remplazada
+simplemente por la media.
 
 ```{R echo=FALSE, message=FALSE, warning=FALSE}
 # Visualización de datos faltantes
 visdat::vis_miss(datos)
 ```
 
-Podemos observar entonces que ya no tenemos datos faltantes, y si ahora volvemos a validar las reglas tendremos
+Podemos observar entonces que ya no tenemos datos faltantes, y si ahora
+volvemos a validar las reglas tendremos
 
 ```{r echo=FALSE, warning=FALSE}
 # Reglas de validación
@@ -272,7 +335,10 @@ Valid_Data <- editrules::violatedEdits(rules, datos)
 summary(Valid_Data)
 ```
 
-Hemos limpiado los datos de manera que cumplan con las reglas establecidas en el punto 1.2, eliminando datos atípicos y faltantes, y factorizando las variables cualitativas que lo solicitaban.
+Hemos limpiado los datos de manera que cumplan con las reglas
+establecidas en el punto 1.2, eliminando datos atípicos y faltantes, y
+factorizando las variables cualitativas que lo solicitaban.
+
 ```{R echo=FALSE}
 # knitr::kable(datos)
 head(datos)
@@ -282,9 +348,21 @@ ruta <- "../Data/clean_huella.csv"
 # write.csv(datos, file = ruta, row.names = FALSE, na = "", fileEncoding = "UTF-8")
 ```
 
-En esta muestra no se alcanzan a visualizar todos los cambios, esto por efectos prácticos y que el documento no quede tan largo, puede encontrar la base de datos limpia en `clean_huella.csv`.
+En esta muestra no se alcanzan a visualizar todos los cambios, esto por
+efectos prácticos y que el documento no quede tan largo, puede encontrar
+la base de datos limpia en `clean_huella.csv`.
 
-Cabe mencionar que Excel puede tener problemas para la decodificación de archivos UTF-8 en csv, mostrando caracteres hispanos como símbolos faltantes, aun así hemos decidido mantener estos caracteres hispanos por fidelidad a la lengua española. R interpreta bien la decodificación de estos por medio del `fileEncoding="UTF-8"`, y si se quiere ver el archivo con toda su integridad se puede abrir `clean_huella.csv` desde un editor de código, o especificar en Excel la decodificación `65001: Unicode (UTF-8)` al importar la hoja, esta no se debe guardar ya que puede afectar la tabla original. Mencionamos todo esto para evitar problemas, y al mismo tiempo dejamos `clean_huella.txt` como alternativa.
+Cabe mencionar que Excel puede tener problemas para la decodificación de
+archivos UTF-8 en csv, mostrando caracteres hispanos como símbolos
+faltantes, aun así hemos decidido mantener estos caracteres hispanos por
+fidelidad a la lengua española. R interpreta bien la decodificación de
+estos por medio del `fileEncoding="UTF-8"`, y si se quiere ver el
+archivo con toda su integridad se puede abrir `clean_huella.csv` desde
+un editor de código, o especificar en Excel la decodificación
+`65001: Unicode (UTF-8)` al importar la hoja, esta no se debe guardar ya
+que puede afectar la tabla original. Mencionamos todo esto para evitar
+problemas, y al mismo tiempo dejamos `clean_huella.txt` como
+alternativa.
 
 ```{r echo=FALSE, message=FALSE}
 # Cargar los datos limpios
@@ -293,13 +371,15 @@ datos <- read.csv(ruta, header = TRUE)
 
 ### 1.8 Creación de varible de Huella Hídrica Total
 
-Procedemos a crear la variable correspondiente a la huella hídrica total `HHT` siendo la suma de la huella hídrica directa e indirecta, y una variable de clasificación `HHT_clas` con base siguientes condiciones:
+Procedemos a crear la variable correspondiente a la huella hídrica total
+`HHT` siendo la suma de la huella hídrica directa e indirecta, y una
+variable de clasificación `HHT_clas` con base siguientes condiciones:
 
 | Grupo | Rango de clasificación |
 |-------|------------------------|
 | Bajo  | si HHT ≤ 1789          |
-| Medio | si 1789 < HHT ≤ 1887   |
-| Alto  | si HHT > 1887          |
+| Medio | si 1789 \< HHT ≤ 1887  |
+| Alto  | si HHT \> 1887         |
 
 ```{R echo=FALSE}
 
@@ -316,7 +396,20 @@ datos$HHT_clas <- cut(datos$HHT,
 
 ### 2.1 Gráficas de distribuciones de Huella Hídrica
 
-La gráfica que representa la Huella Hídrica Directa (HHD) muestra una distribución que parece inclinarse hacia un único pico principal, lo que sugiere que la mayoría de los estudiantes tiene un nivel de consumo de agua directo relativamente homogéneo. La presencia de un pico central y dominante puede indicar que la mayoría de los estudiantes comparten prácticas similares en cuanto al uso directo de agua. En la esquina superior derecha podemos observar un boxplot respectivo al comp_HHD en el oden `lavado_ropa`, `riego_jardin`, `uso_baño`, `uso_cocina` respectivamente. Notamos diferencias notables entre los componentes del uso del agua, como el lavado de ropa, riego de jardín, uso de baño y uso de cocina. El uso de cocina y el uso del baño parecen tener una mediana más alta y una variabilidad mayor en el consumo de agua, indicada por el rango intercuartílico más amplio y los valores atípicos (para las nuevas medidas) presentes.
+La gráfica que representa la Huella Hídrica Directa (HHD) muestra una
+distribución que parece inclinarse hacia un único pico principal, lo que
+sugiere que la mayoría de los estudiantes tiene un nivel de consumo de
+agua directo relativamente homogéneo. La presencia de un pico central y
+dominante puede indicar que la mayoría de los estudiantes comparten
+prácticas similares en cuanto al uso directo de agua. En la esquina
+superior derecha podemos observar un boxplot respectivo al comp_HHD en
+el oden `lavado_ropa`, `riego_jardin`, `uso_baño`, `uso_cocina`
+respectivamente. Notamos diferencias notables entre los componentes del
+uso del agua, como el lavado de ropa, riego de jardín, uso de baño y uso
+de cocina. El uso de cocina y el uso del baño parecen tener una mediana
+más alta y una variabilidad mayor en el consumo de agua, indicada por el
+rango intercuartílico más amplio y los valores atípicos (para las nuevas
+medidas) presentes.
 
 ```{R echo=FALSE, warning=FALSE}
 
@@ -361,7 +454,19 @@ p_HHI <- ggplot(datos, aes(x = HHI)) +
 grid.arrange(p_HHD, p_HHI, nrow = 2)
 ```
 
-Por otro lado, la gráfica de la Huella Hídrica Indirecta (HHI) muestra claramente dos picos, lo que indica una distribución bimodal. Esto sugiere que hay dos patrones principales distintos de consumo de agua indirecto entre los estudiantes. El boxplot superior derecho con respecto a comp_HHI tiene el orden `café`, `carne`, `fruta` respectivamente. La carne, en particular, tiene una mediana considerablemente más alta y un rango más extenso (similar a la del café, pero con menos variación), lo que refleja un consumo de agua indirecto significativamente mayor asociado con este componente. Esto puede deberse al hecho de que la producción de carne generalmente requiere más recursos hídricos que otros alimentos. Los estudiantes que consumen más carne, por lo tanto, contribuyen a una huella hídrica indirecta más elevada.
+Por otro lado, la gráfica de la Huella Hídrica Indirecta (HHI) muestra
+claramente dos picos, lo que indica una distribución bimodal. Esto
+sugiere que hay dos patrones principales distintos de consumo de agua
+indirecto entre los estudiantes. El boxplot superior derecho con
+respecto a comp_HHI tiene el orden `café`, `carne`, `fruta`
+respectivamente. La carne, en particular, tiene una mediana
+considerablemente más alta y un rango más extenso (similar a la del
+café, pero con menos variación), lo que refleja un consumo de agua
+indirecto significativamente mayor asociado con este componente. Esto
+puede deberse al hecho de que la producción de carne generalmente
+requiere más recursos hídricos que otros alimentos. Los estudiantes que
+consumen más carne, por lo tanto, contribuyen a una huella hídrica
+indirecta más elevada.
 
 ```{R echo=FALSE}
 bp_HHT <- ggplot(datos, aes(x = factor(HHT_clas), y = HHT)) + 
@@ -386,15 +491,40 @@ p_HHT <- ggplot(datos, aes(x = HHT)) +
 grid.arrange(p_HHT, nrow = 1)
 ```
 
-La distribución de la Huella Hídrica Total (HHT) parece tener un rango amplio de valores con varias concentraciones a lo largo del espectro. La presencia de múltiples picos en el histograma sugiere que hay diferentes grupos de estudiantes con distintos niveles de consumo total de agua. Esto puede reflejar la diversidad en las prácticas de consumo y producción que afectan tanto la huella hídrica directa como la indirecta de los estudiantes.
+La distribución de la Huella Hídrica Total (HHT) parece tener un rango
+amplio de valores con varias concentraciones a lo largo del espectro. La
+presencia de múltiples picos en el histograma sugiere que hay diferentes
+grupos de estudiantes con distintos niveles de consumo total de agua.
+Esto puede reflejar la diversidad en las prácticas de consumo y
+producción que afectan tanto la huella hídrica directa como la indirecta
+de los estudiantes.
 
-El boxplot superior a la derecha para HHT es con respecto a los grupos `Bajo`, `Medio` y `Alto`, muestra una clara distinción entre los tres grupos. Los estudiantes clasificados en el grupo `Bajo` tienen una mediana inferior a los de los grupos `Medio` y `Alto`, lo que indica que sus prácticas generales de consumo de agua son menos intensivas. El grupo `Medio` presenta una variabilidad relativamente menor comparado con el grupo `Alto`, lo que podría sugerir que los estudiantes en esta categoría tienen hábitos de consumo de agua más consistentes entre ellos.
+El boxplot superior a la derecha para HHT es con respecto a los grupos
+`Bajo`, `Medio` y `Alto`, muestra una clara distinción entre los tres
+grupos. Los estudiantes clasificados en el grupo `Bajo` tienen una
+mediana inferior a los de los grupos `Medio` y `Alto`, lo que indica que
+sus prácticas generales de consumo de agua son menos intensivas. El
+grupo `Medio` presenta una variabilidad relativamente menor comparado
+con el grupo `Alto`, lo que podría sugerir que los estudiantes en esta
+categoría tienen hábitos de consumo de agua más consistentes entre
+ellos.
 
-El grupo `Alto` muestra no solo una mediana más elevada, sino también la presencia de valores atípicos. Esto indica que hay una variación significativa en el consumo de agua dentro de este grupo, con algunos estudiantes que tienen un consumo de agua particularmente alto. Estos valores atípicos pueden deberse a prácticas específicas o a circunstancias individuales que resultan en un consumo mucho mayor que el promedio de sus pares.
+El grupo `Alto` muestra no solo una mediana más elevada, sino también la
+presencia de valores atípicos. Esto indica que hay una variación
+significativa en el consumo de agua dentro de este grupo, con algunos
+estudiantes que tienen un consumo de agua particularmente alto. Estos
+valores atípicos pueden deberse a prácticas específicas o a
+circunstancias individuales que resultan en un consumo mucho mayor que
+el promedio de sus pares.
 
 ### 2.2 Comportamiento de HHD y HHI con cada factor
 
-Podemos observar 
+
+Se observa que la variable HHD, que representa el consumo de agua directa, es más alto en el grupo femenino. Esta diferencia es evidente en la gráfica, donde la media es relativamente superior a la del grupo masculino. Además, se destaca una mayor variabilidad en este grupo. Lo mismo sucede con el consumo de agua indirecta, el cual es considerablemente mayor en el grupo femenino.
+
+En cuanto al comportamiento de HHD por grado, notamos que la gráfica muestra un mayor consumo para el sexto grado. Sin embargo, se aprecia una variabilidad significativa entre cada grado. Por otro lado, el consumo indirecto de agua es más alto para el noveno grado, con un rango intercuartílico más estrecho y tiende a ser mayor en el 50% de las mediciones.
+
+Finalmente, se evidencia que el consumo de agua directo e indirecto, medido en cada zona, tiene un comportamiento similar. La media y los rangos intercuartílicos están muy cercanos. A partir de esto, podemos concluir que el consumo de agua fue similar para ambas zonas, aunque es importante destacar que para la zona urbana hay más variabilidad.
 
 ```{R echo=FALSE, warning=FALSE, fig.width=14, fig.height=12}
 common_theme <- theme_minimal() +
@@ -439,7 +569,8 @@ grid.arrange(
 ```
 
 ### 2.3 Resumen de principales indicadores descriptivos por factor
-Podemos observar 
+
+Podemos observar
 
 ```{R echo=FALSE, warning=FALSE}
 # 2.3 Resumen general de indicadores descriptivos para HHD y HHI
@@ -482,28 +613,28 @@ resumen_zona_HHI <- crear_resumen(datos %>% group_by(zona), "HHI", "HHI")
 
 ```
 
-Podemos observar 
+Podemos observar
 
 ```{R echo=FALSE}
 kable(resumen_general_HHD, caption = "Resumen General de HHD", align = 'c')
 kable(resumen_general_HHI, caption = "Resumen General de HHI", align = 'c')
 ```
 
-Podemos observar 
+Podemos observar
 
 ```{R echo=FALSE}
 kable(resumen_genero_HHD, caption = "Resumen de HHD por Género", align = 'c')
 kable(resumen_genero_HHI, caption = "Resumen de HHI por Género", align = 'c')
 ```
 
-Podemos observar 
+Podemos observar
 
 ```{R echo=FALSE}
 kable(resumen_grado_HHD, caption = "Resumen de HHD por Grado Escolar", align = 'c')
 kable(resumen_grado_HHI, caption = "Resumen de HHI por Grado Escolar", align = 'c')
 ```
 
-Podemos observar 
+Podemos observar
 
 ```{R echo=FALSE}
 kable(resumen_zona_HHD, caption = "Resumen de HHD por Zona", align = 'c')
