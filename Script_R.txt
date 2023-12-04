@@ -1,20 +1,17 @@
 # Laboratorio, Preprocesamiento de datos con R, Probabilidad y Estadística.
-# Archivo: Script_R.r
+# Archivo: Script_R.txt
 # Autores: Juan Camilo Narváez Tascón, 2140112-3743
 #          Óscar David Cuaical, 2270657-3743
 # Fecha creación: 21-11-23
 # Fecha última modificación: 3-12-23
 # Licencia: GPL-3.0
 
-# Historia: Se desea caracterizar la huella hídrica de una institución de
-# educación secundaria,se dispone de la base de datos data/BD_huella.txt,
-# la cual contiene información de los estudiantes como: edad, genero, zona,
-# grado escolar, cantidad de HH directa e indirecta en m3/año (HHD y HHI),
-# el mayor componente de la HH directa e indirecta (comp_HHD y comp_HHI),
-# y el número de personas que habitan en el hogar (per.hog).
+# El código presente está pensado para un entorno independiente, por lo tanto varía ligeramente con el código que está
+# en R markdown, ya que el apartado visual se compila diferente. También incluímos más cosas en el archivo Rmd para
+# poder presentar un estudio más adecuado y convincente. Puede consultar `Informe_Huella.Rmd`.
 
 # -------------------------------------------------------------------------
-# Librerías necesarias
+# Librerías Necesarias
 # install.packages("visdat") # Se recomienda última versión.
 # install.packages("rmarkdown")
 # install.packages("dplyr") # Se recomienda última versión.
@@ -36,9 +33,11 @@ library(tidyr)
 library(ggplot2)
 library(knitr)
 
+# -------------------------------------------------------------------------
 # 1.1 Carga de datos
 datos <- read.csv("Data/BD_Huella.txt", header = TRUE, sep = "\t")
 
+# -------------------------------------------------------------------------
 # 1.3 Limpieza de datos y calificación de variables cualitativas
 datos <- datos %>%
   mutate(
@@ -68,10 +67,12 @@ datos <- datos %>%
     comp_HHI = tolower(comp_HHI)
   )
 
+# -------------------------------------------------------------------------
 # 1.4 Visualización de datos faltantes
 x11()
 print(vis_miss(datos))
 
+# -------------------------------------------------------------------------
 # 1.5 Estudio de datos atípicos
 x11()
 variables_interes <- c("edad", "HHD", "HHI", "per.hog")
@@ -97,10 +98,12 @@ calcular_cerco_superior_y_conteo <- function(data, variable) {
     return(mensaje)
 }
 
+# Aplicar la función a las variables de interés
 calcular_cerco_superior_y_conteo(datos, "HHD")
 calcular_cerco_superior_y_conteo(datos, "HHI")
 calcular_cerco_superior_y_conteo(datos, "per.hog")
 
+# -------------------------------------------------------------------------
 # 1.6 Limpieza de datos atípicos y faltantes.
 reemplazar_atipicos_con_NA <- function(data, variable) {
     Q3 <- quantile(data[[variable]], 0.75, na.rm = TRUE)
@@ -140,18 +143,21 @@ datos$per.hog[is.na(datos$per.hog)] <- mean_per_hog
 # Limpieza de per.hog
 datos$per.hog <- ifelse(is.na(datos$per.hog) | datos$per.hog <= 0, mean_per_hog, datos$per.hog)
 
+# -------------------------------------------------------------------------
 # 1.2 Reglas de validación
 rules <- editrules::editfile("Informe/consistencia.txt")
 Valid_Data <- editrules::violatedEdits(rules, datos)
 summary(Valid_Data)
 
+# -------------------------------------------------------------------------
 # 1.7 Guardar datos limpios
 ruta <- "Data/clean_huella.csv"
-# write.csv(datos, file = ruta, row.names = FALSE, na = "", fileEncoding = "UTF-8")
+write.csv(datos, file = ruta, row.names = FALSE, na = "", fileEncoding = "UTF-8")
 
 # Carga de datos limpios
 datos <- read.csv(ruta, header = TRUE)
 
+# -------------------------------------------------------------------------
 # 1.8 Creacion de las nuevas variables HHT Y HHT_clas
 datos$HHT <- datos$HHD + datos$HHI
 datos$HHT_clas <- cut(datos$HHT,
@@ -159,6 +165,7 @@ datos$HHT_clas <- cut(datos$HHT,
                       labels = c("bajo", "medio", "alto"),
                       include.lowest = TRUE)
 
+# -------------------------------------------------------------------------
 # 2.1 Distribuciones
 x11()
 grid.arrange(p_HHD, bp_HHD, p_HHI, bp_HHI, p_HHT, bp_HHT, ncol = 2, nrow = 3)
@@ -210,6 +217,7 @@ p_HHT <- ggplot(datos, aes(x = HHT)) +
   labs(title = "Distribución de HHT", x = "HHT", y = "Densidad") +
   bp_theme
 
+# -------------------------------------------------------------------------
 # 2.2 Comportamiento de HHD y HHI con cada factor
 x11()
 common_theme <- theme_minimal() +
@@ -251,6 +259,7 @@ grid.arrange(
   ncol = 2, nrow = 3
 )
 
+# -------------------------------------------------------------------------
 # 2.3 Resumen general de indicadores descriptivos para HHD y HHI
 # Función para calcular la moda
 moda <- function(x) {

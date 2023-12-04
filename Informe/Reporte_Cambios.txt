@@ -1,5 +1,5 @@
 # Laboratorio, Preprocesamiento de datos con R, Probabilidad y Estadística.
-# Archivo: consistencia.txt
+# Archivo: Reporte_Cambios.txt
 # Autores: Juan Camilo Narváez Tascón, 2140112-3743
 #          Óscar David Cuaical, 2270657-3743
 # Fecha creación: 3-12-23
