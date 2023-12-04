@@ -519,12 +519,25 @@ el promedio de sus pares.
 
 ### 2.2 Comportamiento de HHD y HHI con cada factor
 
+Se observa que la variable HHD, que representa el consumo de agua
+directa, es más alto en el grupo femenino. Esta diferencia es evidente
+en la gráfica, donde la media es relativamente superior a la del grupo
+masculino. Además, se destaca una mayor variabilidad en este grupo. Lo
+mismo sucede con el consumo de agua indirecta, el cual es
+considerablemente mayor en el grupo femenino.
 
-Se observa que la variable HHD, que representa el consumo de agua directa, es más alto en el grupo femenino. Esta diferencia es evidente en la gráfica, donde la media es relativamente superior a la del grupo masculino. Además, se destaca una mayor variabilidad en este grupo. Lo mismo sucede con el consumo de agua indirecta, el cual es considerablemente mayor en el grupo femenino.
+En cuanto al comportamiento de HHD por grado, notamos que la gráfica
+muestra un mayor consumo para el sexto grado. Sin embargo, se aprecia
+una variabilidad significativa entre cada grado. Por otro lado, el
+consumo indirecto de agua es más alto para el noveno grado, con un rango
+intercuartílico más estrecho y tiende a ser mayor en el 50% de las
+mediciones.
 
-En cuanto al comportamiento de HHD por grado, notamos que la gráfica muestra un mayor consumo para el sexto grado. Sin embargo, se aprecia una variabilidad significativa entre cada grado. Por otro lado, el consumo indirecto de agua es más alto para el noveno grado, con un rango intercuartílico más estrecho y tiende a ser mayor en el 50% de las mediciones.
-
-Finalmente, se evidencia que el consumo de agua directo e indirecto, medido en cada zona, tiene un comportamiento similar. La media y los rangos intercuartílicos están muy cercanos. A partir de esto, podemos concluir que el consumo de agua fue similar para ambas zonas, aunque es importante destacar que para la zona urbana hay más variabilidad.
+Finalmente, se evidencia que el consumo de agua directo e indirecto,
+medido en cada zona, tiene un comportamiento similar. La media y los
+rangos intercuartílicos están muy cercanos. A partir de esto, podemos
+concluir que el consumo de agua fue similar para ambas zonas, aunque es
+importante destacar que para la zona urbana en el consumo directo de agua hay más variabilidad, mientras que en las mediciones del consumo indirecto hay mas variabilidad en la zona rural.
 
 ```{R echo=FALSE, warning=FALSE, fig.width=14, fig.height=12}
 common_theme <- theme_minimal() +
@@ -570,7 +583,15 @@ grid.arrange(
 
 ### 2.3 Resumen de principales indicadores descriptivos por factor
 
-Podemos observar
+En el resumen general, se destaca que el consumo promedio de agua
+directa (HHD) para la institución de educación secundaria es de
+aproximadamente 120 metros cúbicos por año, con una mediana de 109
+metros cúbicos. La variabilidad en estos datos es moderada, como se
+refleja en la desviación estándar de alrededor de 64.43 metros cúbicos.
+En cuanto al consumo de agua indirecta (HHI), el promedio es más alto,
+alrededor de 819.53 metros cúbicos por año, con una mediana de 789
+metros cúbicos. La variabilidad en HHI es mayor que en HHD, con una
+desviación estándar de aproximadamente 523.27 metros cúbicos.
 
 ```{R echo=FALSE, warning=FALSE}
 # 2.3 Resumen general de indicadores descriptivos para HHD y HHI
@@ -613,28 +634,28 @@ resumen_zona_HHI <- crear_resumen(datos %>% group_by(zona), "HHI", "HHI")
 
 ```
 
-Podemos observar
+
 
 ```{R echo=FALSE}
 kable(resumen_general_HHD, caption = "Resumen General de HHD", align = 'c')
 kable(resumen_general_HHI, caption = "Resumen General de HHI", align = 'c')
 ```
 
-Podemos observar
+En términos de género, se evidencia que el grupo femenino tiende a tener un mayor consumo tanto en HHD como en HHI en comparación con el grupo masculino. El consumo promedio y la mediana son significativamente más altos para el grupo femenino en ambas categorías. Además, la variabilidad es mayor en el grupo femenino, lo que sugiere una diversidad de patrones de consumo entre las estudiantes.
 
 ```{R echo=FALSE}
 kable(resumen_genero_HHD, caption = "Resumen de HHD por Género", align = 'c')
 kable(resumen_genero_HHI, caption = "Resumen de HHI por Género", align = 'c')
 ```
 
-Podemos observar
+En el análisis por grado escolar, se destaca que el sexto grado presenta el mayor consumo promedio de HHD, mientras que el noveno grado lidera en el consumo de HHI. La variabilidad entre los diferentes grados es notable, indicando que hay variaciones significativas en los patrones de consumo de agua entre los distintos niveles escolares.
 
 ```{R echo=FALSE}
 kable(resumen_grado_HHD, caption = "Resumen de HHD por Grado Escolar", align = 'c')
 kable(resumen_grado_HHI, caption = "Resumen de HHI por Grado Escolar", align = 'c')
 ```
 
-Podemos observar
+Al analizar por zona, se observa que el consumo promedio de HHD es similar tanto en zonas rurales como urbanas, aunque con ligeras diferencias. La variabilidad es un poco más pronunciada en la zona urbana. En cuanto a HHI, la zona rural muestra un consumo promedio ligeramente más alto que la zona urbana, y nuevamente se observa una mayor variabilidad en la zona rural. Esto podría indicar diferencias en los patrones de consumo de agua entre áreas geográficas.
 
 ```{R echo=FALSE}
 kable(resumen_zona_HHD, caption = "Resumen de HHD por Zona", align = 'c')
